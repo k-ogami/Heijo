@@ -1,9 +1,9 @@
 package rocatmonitor;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
@@ -22,15 +22,19 @@ import org.objectweb.asm.Opcodes;
 public class Agent
 {
 
-  // オプション（デフォルト値）
+  // 値は適当
   private static String host = "localhost";
   private static int port = 8000;
   private static int interval = 20;
-  private static String ignore_file_path = null;
+
+  // 設定ファイルパス
+  private static final String default_file_path = "/default.conf";
+  private static final String ignore_file_path = "/ignore.conf";
 
   public static void premain(String args, Instrumentation inst)
   {
     // オプションを読み込む
+    ReadDefaultConf();
     SetOptions(args);
 
     // 接続する
@@ -47,29 +51,61 @@ public class Agent
 
     // バイトコード書き換えのTransformerを追加
     Transformer transformer = new Transformer();
-    try {
-      SetIgnore(transformer, ignore_file_path);
-    } catch (IOException e) {
-      System.err.println("RocatMonitorAgent:ファイル\"" + ignore_file_path + "\"を開けません。デフォルトの設定を適応します。");
-    }
+    SetIgnore(transformer);
     inst.addTransformer(transformer);
+  }
+
+  private static void ReadDefaultConf()
+  {
+    try {
+      InputStream stream = Agent.class.getResourceAsStream(default_file_path);
+      if (stream != null) {
+        Pattern pattern_host = Pattern.compile("^host:(.*)$");
+        Pattern pattern_port = Pattern.compile("^port:([0-9]*)$");
+        Pattern pattern_interval = Pattern.compile("^interval:([0-9]*)$");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+          if (line.length() != 0) {
+            Matcher matcher;
+            matcher = pattern_host.matcher(line);
+            if (matcher.find()) {
+              host = matcher.group(1);
+              continue;
+            }
+            matcher = pattern_port.matcher(line);
+            if (matcher.find()) {
+              port = Integer.valueOf(matcher.group(1));
+              continue;
+            }
+            matcher = pattern_interval.matcher(line);
+            if (matcher.find()) {
+              interval = Integer.valueOf(matcher.group(1));
+              continue;
+            }
+          }
+        }
+        reader.close();
+        stream.close();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   private static void SetOptions(String options)
   {
     // オプションの形式（順不同でカンマで区切る）
-    // host:****,port:****,interval:****,ignore_file_path:****
-    // host: 送信先のホスト名あるいはIPアドレス デフォルトではlocalhost
-    // port: 送信先のポート番号 デフォルトでは8000
-    // interval: 送信の間隔 デフォルトでは20[ms]
-    // ignore_file_path: 監視対象から除外するパッケージの名前を記述したファイルのパス
+    // host:****,port:****,interval:****
+    // host: 送信先のホスト名あるいはIPアドレス
+    // port: 送信先のポート番号
+    // interval: 送信の間隔 [ミリ秒]
 
     // オプション読み込み
     if (options != null) {
       Pattern pattern_host = Pattern.compile("^host:(.*)$");
       Pattern pattern_port = Pattern.compile("^port:([0-9]*)$");
       Pattern pattern_interval = Pattern.compile("^interval:([0-9]*)$");
-      Pattern pattern_ignore_file_path = Pattern.compile("^ignore_file_path:(.*)$");
       String[] tokens = options.split(",");
       for (String token : tokens) {
         Matcher matcher;
@@ -88,31 +124,30 @@ public class Agent
           interval = Integer.valueOf(matcher.group(1));
           continue;
         }
-        matcher = pattern_ignore_file_path.matcher(token);
-        if (matcher.find()) {
-          ignore_file_path = matcher.group(1);
-          continue;
-        }
       }
     }
   }
 
-  private static void SetIgnore(Transformer transformer, String path) throws IOException
+  private static void SetIgnore(Transformer transformer)
   {
     // 現段階では、javaパッケージとsunパッケージは監視不可
     transformer.IgnorePackageNames.add("java");
     transformer.IgnorePackageNames.add("sun");
 
-    if (path != null) {
-      BufferedReader reader;
-      reader = new BufferedReader(new FileReader(new File(path)));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        if (line.length() != 0) {
-          transformer.IgnorePackageNames.add(line);
+    try {
+      InputStream stream = Agent.class.getResourceAsStream(ignore_file_path);
+      if (stream != null) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+        String line;
+        while ((line = reader.readLine()) != null) {
+          if (line.length() != 0) {
+            transformer.IgnorePackageNames.add(line);
+          }
         }
+        reader.close();
+        stream.close();
       }
-      reader.close();
+    } catch (IOException e) {
     }
   }
 
