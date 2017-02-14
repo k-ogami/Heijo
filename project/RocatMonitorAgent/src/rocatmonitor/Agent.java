@@ -63,7 +63,6 @@ public class Agent
     // port: 送信先のポート番号 デフォルトでは8000
     // interval: 送信の間隔 デフォルトでは20[ms]
     // ignore_file_path: 監視対象から除外するパッケージの名前を記述したファイルのパス
-    // デフォルトでは標準ライブラリを含むパッケージの名前が設定される
 
     // オプション読み込み
     if (options != null) {
@@ -100,14 +99,11 @@ public class Agent
 
   private static void SetIgnore(Transformer transformer, String path) throws IOException
   {
-    if (path == null) {
-      // デフォルト設定で監視対象から除外されるパッケージの名前
-      transformer.IgnorePackageNames.add("java");
-      transformer.IgnorePackageNames.add("javax");
-      transformer.IgnorePackageNames.add("jdk");
-      transformer.IgnorePackageNames.add("sun");
-      transformer.IgnorePackageNames.add("com/sun");
-    } else {
+    // 現段階では、javaパッケージとsunパッケージは監視不可
+    transformer.IgnorePackageNames.add("java");
+    transformer.IgnorePackageNames.add("sun");
+
+    if (path != null) {
       BufferedReader reader;
       reader = new BufferedReader(new FileReader(new File(path)));
       String line;
