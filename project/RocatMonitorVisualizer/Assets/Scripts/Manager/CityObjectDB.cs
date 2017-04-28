@@ -21,7 +21,7 @@ public class CityObjectDB : MonoBehaviour
     // 引数
     string[] args = MethodSig2ArgTypes(info.MethodSig);
     // 実装クラス名(パッケージ名含む)
-    string declare = ConvertTypeName(info.ClassSig);
+    string declare = ConvertTypeName("L" + info.ClassSig + ";");
 
     // メソッドより上位のオブジェクトらが登録されていなければを登録。メソッドの1つ上のクラスオブジェクトを取得
     ClassObject klass = RegistObjectsOverMethod(declare);

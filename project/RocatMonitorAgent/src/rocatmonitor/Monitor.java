@@ -9,14 +9,10 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import rocatmonitor.json.ExeTimeInfo;
-import rocatmonitor.json.MethodInfo;
 import rocatmonitor.json.RootJSON;
 
 public class Monitor
 {
-
-  public static Connector Connector = new Connector();
-  public static IntervalThread IntervalThread = new IntervalThread();
 
   private static class TimeFrame
   {
@@ -61,12 +57,8 @@ public class Monitor
 
   // メソッドと開始時間のスタックトレース。<スレッドID, スタックトレース>
   private static Map<Long, List<TimeFrame>> timeStackMap = new HashMap<Long, List<TimeFrame>>();
-  // メソッド情報のデータベース。<メソッドID, メソッド情報>
-  private static Map<Long, MethodInfo> methodInfoMap = new HashMap<Long, MethodInfo>();
   // スレッド・メソッドごとの実行時間のマップ。送信先に教えるとクリアされる。<<スレッドID, メソッドID>, 実行時間>
   private static Map<ExeTimeKey, Long> exeTimeMap = new HashMap<ExeTimeKey, Long>();
-  // 初めてロードされたクラスのメソッド情報のリスト。送信先に教えるとクリアされる
-  private static List<MethodInfo> unknownMethodList = new LinkedList<MethodInfo>();
 
   private static Object lock = new Object();
   private static boolean isAlive = true;
@@ -164,33 +156,11 @@ public class Monitor
       // JSONを生成して送信
       RootJSON json = CreateJSON();
       if (json != null) {
-        Connector.Send(json);
+        Agent.Connector.Send(json);
       }
 
       // 削除
       exeTimeMap.clear();
-    }
-  }
-
-  public static void Destroy()
-  {
-    synchronized (lock) {
-      isAlive = false;
-      timeStackMap = null;
-      methodInfoMap = null;
-      exeTimeMap = null;
-      unknownMethodList = null;
-    }
-  }
-
-  public static void RegistMethod(long methodID, String classSig, String methodSig, String methodName)
-  {
-    if (!isAlive) return;
-
-    synchronized (lock) {
-      MethodInfo info = new MethodInfo(methodID, classSig, methodSig, methodName);
-      methodInfoMap.put(methodID, info);
-      unknownMethodList.add(info);
     }
   }
 
@@ -209,14 +179,9 @@ public class Monitor
   {
     RootJSON json = new RootJSON();
     json.Time = time;
-    for (MethodInfo methodInfo : unknownMethodList) {
-      json.MethodInfos.add(methodInfo);
-    }
-    unknownMethodList.clear();
     for (Entry<ExeTimeKey, Long> entry : exeTimeMap.entrySet()) {
       json.ExeTimeInfos.add(new ExeTimeInfo(entry.getKey().ThreadID, entry.getKey().MethodID, entry.getValue()));
     }
-
     return json;
   }
 

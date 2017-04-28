@@ -11,7 +11,7 @@ import rocatmonitor.json.RootJSON;
 public class Connector
 {
 
-  public static final int HEADER_SIZE = 4;
+  public static final int HEADER_SIZE = 8;
   public static final String JSON_CHARSET = "UTF-8";
 
   public Socket Socket = null;
@@ -25,6 +25,11 @@ public class Connector
 
   public void Send(RootJSON json) throws IOException
   {
+    if (Agent.DEBUG_NO_CONNECT) {
+      System.out.println(JSON.encode(json));
+      return;
+    }
+
     byte[] payload = JSON.encode(json).getBytes(JSON_CHARSET);
     byte[] header_inv = ByteBuffer.allocate(HEADER_SIZE).putInt(payload.length).array();
     byte[] header = new byte[HEADER_SIZE];

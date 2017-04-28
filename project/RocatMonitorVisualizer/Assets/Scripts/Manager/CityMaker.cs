@@ -40,7 +40,7 @@ public class CityMaker : MonoBehaviour
     // 未知のメソッドが知らされたとき、DBに登録して、街を再構築
     bool remake = false;
     foreach (RootJSON json in jsons)
-      if (json.MethodInfos.Length != 0) {
+      if (json != null && json.MethodInfos != null) {
         foreach (MethodInfo methodInfo in json.MethodInfos) {
           Manager.CityObjectDB.RegistUnknownMethod(methodInfo);
           remake = true;
@@ -51,7 +51,9 @@ public class CityMaker : MonoBehaviour
     }
     // メソッドの実行時間の情報を処理
     foreach (RootJSON json in jsons) {
-      Manager.ExeTimeDB.RegistInfo(json.ExeTimeInfos, json.Time);
+      if (json != null && json.ExeTimeInfos != null) {
+        Manager.ExeTimeDB.RegistInfo(json.ExeTimeInfos, json.Time);
+      }
     }
     Manager.ExeTimeDB.SetHeight();
   }

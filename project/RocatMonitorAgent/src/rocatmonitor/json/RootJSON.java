@@ -6,8 +6,8 @@ import java.util.List;
 public class RootJSON
 {
 
-  public long Time;
+  public long Time = 0;
   public List<MethodInfo> MethodInfos = new LinkedList<MethodInfo>();
-  public List<ExeTimeInfo> ExeTimeInfos = new LinkedList<ExeTimeInfo>();
+  public List<ExeTimeInfo> ExeTimeInfos = new LinkedList<ExeTimeInfo>();;
 
 }
