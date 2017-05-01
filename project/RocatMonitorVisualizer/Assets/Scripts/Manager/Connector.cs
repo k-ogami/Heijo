@@ -31,6 +31,10 @@ public class Connector : MonoBehaviour
   // 受信したデータを蓄積
   private LinkedList<RootJSON> receivedDataList = new LinkedList<RootJSON>();
 
+  private int save_file_num = 0;
+
+  private bool connect_flag = false;
+
   private void Awake()
   {
     // 接続・受信用スレッドを生成
@@ -80,12 +84,23 @@ public class Connector : MonoBehaviour
     return receivedDataList.Count != 0;
   }
 
+  public bool GetConnectFlag()
+  {
+    bool flag = connect_flag;
+    connect_flag = false;
+    return flag;
+  }
+
   // 別スレッドで処理される処理
   private void ThreadLoop()
   {
     while (true) {
-      Accept();  // 接続が完了するまでブロック
-      Receive(); // 受信ループ。通信が切断されるまでブロック
+      try {
+        Accept();  // 接続が完了するまでブロック
+        Receive(); // 受信ループ。通信が切断されるまでブロック
+      }
+      catch (Exception) {
+      }
     }
   }
 
@@ -107,16 +122,25 @@ public class Connector : MonoBehaviour
     catch (ArgumentException) {
       print("エラー：テストファイル\"" + TestFilePath + "\"のデシリアライズに失敗しました。");
     }
-
   }
 
   // 接続待ち
   private void Accept()
   {
+    IsConnected = false;
+
+    // 切断処理
+    if (socket.Connected) {
+      socket.Close();
+      receivedDataList.Clear();
+    }
+
     TcpListener listener = new TcpListener(IPAddress.Any, Port);
     listener.Start();
     socket = listener.AcceptTcpClient();
+    listener.Stop();
     IsConnected = true;
+    connect_flag = true;
   }
 
   // 受信ループ処理
@@ -138,13 +162,7 @@ public class Connector : MonoBehaviour
         int h_count = HEADER_SIZE;
         while (h_count != 0) {
           Thread.Sleep(1);
-          try {
-            h_count -= stream.Read(header, 0, h_count);
-          }
-          catch (IOException ex) {
-            print(ex);
-            return;
-          }
+          h_count -= stream.Read(header, 0, h_count);
           ms.Write(header, 0, header.Length);
         }
         ms.Read(header, 0, header.Length);
@@ -155,7 +173,7 @@ public class Connector : MonoBehaviour
       }
       // ペイロード読み込み
       if (PrintLog) {
-        print("Connector:ペイロード（" +  payload_size + "バイト）受信開始");
+        print("Connector:ペイロード（" + payload_size + "バイト）受信開始");
       }
       string text = null;
       {
@@ -189,11 +207,11 @@ public class Connector : MonoBehaviour
   private void Save(string text)
   {
     string filename;
-    if (SavePath[SavePath.Length - 1] != '/' || SavePath[SavePath.Length - 1] != '\\') {
+    if (SavePath[SavePath.Length - 1] != '/' && SavePath[SavePath.Length - 1] != '\\') {
       SavePath += "/";
     }
-    for (int i = 0; ; i++) {
-      filename = SavePath + SaveFileName + "_" + i + ".txt";
+    for (; ; save_file_num++) {
+      filename = SavePath + SaveFileName + "_" + save_file_num + ".txt";
       if (!File.Exists(filename)) {
         break;
       }

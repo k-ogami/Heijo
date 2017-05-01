@@ -11,6 +11,8 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import rocatmonitor.json.MethodInfo;
+
 public class ByteTransformer implements ClassFileTransformer
 {
 
@@ -34,6 +36,7 @@ public class ByteTransformer implements ClassFileTransformer
     ClassWriter writer = new ClassWriter(reader, 0);
     AddMonitoringClassVisitor visitor = new AddMonitoringClassVisitor(writer, className, methodInfoMap);
     reader.accept(visitor, 0);
+
     return writer.toByteArray();
   }
 
@@ -58,9 +61,8 @@ public class ByteTransformer implements ClassFileTransformer
 
   }
 
-  private class AddMonitoringMethodVisitor extends MethodVisitor
+  private static class AddMonitoringMethodVisitor extends MethodVisitor
   {
-
     private long methodID = -1;
 
     private AddMonitoringMethodVisitor(MethodVisitor mv, String classSig, String methodSig, String methodName, Map<MethodInfoKey, Long> methodInfoMap)
@@ -69,6 +71,9 @@ public class ByteTransformer implements ClassFileTransformer
       MethodInfoKey key = new MethodInfoKey(classSig, methodSig, methodName);
       if (methodInfoMap.containsKey(key)) {
         methodID = methodInfoMap.get(key);
+        if (!Agent.ConfigReader.OneLoad) {
+          Monitor.RegistMethod(new MethodInfo(methodID, classSig, methodSig, methodName));
+        }
       }
     }
 

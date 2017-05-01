@@ -32,15 +32,23 @@ public class CityMaker : MonoBehaviour
   public void Work(List<RootJSON> jsons)
   {
     // 初生成のとき
-    if (Manager.CityObjectDB.DefaultPackage == null) {
+    if (Manager.Connector.GetConnectFlag()) {
+      // 全消去
+      Manager.CityObjectDB.Clear();
+      Manager.ExeTimeDB.Clear();
+
+      // 初期化
       Manager.CityObjectDB.DefaultPackage = PackageObject.Create(DefaultPackageName);
       Manager.CityObjectDB.DefaultPackage.transform.parent = CitySpace.transform;
       Manager.CityObjectDB.DefaultPackage.Visible = true;
+      Manager.CityObjectDB.DefaultPackage.GetComponent<Renderer>().material.color = PackageColor;
     }
-    // 未知のメソッドが知らされたとき、DBに登録して、街を再構築
+
     bool remake = false;
+
+    // 未知のメソッドが知らされたとき、DBに登録して、街を再構築
     foreach (RootJSON json in jsons)
-      if (json != null && json.MethodInfos != null) {
+      if (json.MethodInfos.Length != 0) {
         foreach (MethodInfo methodInfo in json.MethodInfos) {
           Manager.CityObjectDB.RegistUnknownMethod(methodInfo);
           remake = true;
@@ -49,6 +57,7 @@ public class CityMaker : MonoBehaviour
     if (remake) {
       Remake();
     }
+
     // メソッドの実行時間の情報を処理
     foreach (RootJSON json in jsons) {
       if (json != null && json.ExeTimeInfos != null) {
@@ -188,7 +197,7 @@ public class CityMaker : MonoBehaviour
         color.b = 1;
       }
     }
-    obj.GetComponent<Renderer>().material.color = color; ;
+    obj.GetComponent<Renderer>().material.color = color;
     // 子へ再帰
     if (obj.IsPackage) {
       foreach (CityObject child in obj.PackageChildren.Values) {

@@ -15,6 +15,7 @@ public class ConfigReader
   public String Host = "localhost";
   public int Port = 8000;
   public int Interval = 100;
+  public boolean OneLoad = true;
 
   // 除外パッケージのリスト
   public List<String> IgnorePackageList = new LinkedList<String>();
@@ -41,6 +42,7 @@ public class ConfigReader
         Pattern pattern_host = Pattern.compile("^host:(.*)$");
         Pattern pattern_port = Pattern.compile("^port:([0-9]*)$");
         Pattern pattern_interval = Pattern.compile("^interval:([0-9]*)$");
+        Pattern pattern_oneload = Pattern.compile("^oneload:(.*)$");
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         String line;
         while ((line = reader.readLine()) != null) {
@@ -61,6 +63,11 @@ public class ConfigReader
               Interval = Integer.valueOf(matcher.group(1));
               continue;
             }
+            matcher = pattern_oneload.matcher(line);
+            if (matcher.find()) {
+              OneLoad = Boolean.valueOf(matcher.group(1));
+              continue;
+            }
           }
         }
         reader.close();
@@ -74,16 +81,18 @@ public class ConfigReader
   private void SetOptions(String options)
   {
     // オプションの形式（順不同でカンマで区切る）
-    // host:****,port:****,interval:****
+    // host:****,port:****,interval:****,oneload:****
     // host: 送信先のホスト名あるいはIPアドレス
     // port: 送信先のポート番号
     // interval: 送信の間隔 [ミリ秒]
+    // oneload:"true" or other
 
     // オプション読み込み
     if (options != null) {
       Pattern pattern_host = Pattern.compile("^host:(.*)$");
       Pattern pattern_port = Pattern.compile("^port:([0-9]*)$");
       Pattern pattern_interval = Pattern.compile("^interval:([0-9]*)$");
+      Pattern pattern_oneload = Pattern.compile("^oneload:(.*)$");
       String[] tokens = options.split(",");
       for (String token : tokens) {
         Matcher matcher;
@@ -100,6 +109,11 @@ public class ConfigReader
         matcher = pattern_interval.matcher(token);
         if (matcher.find()) {
           Interval = Integer.valueOf(matcher.group(1));
+          continue;
+        }
+        matcher = pattern_oneload.matcher(token);
+        if (matcher.find()) {
+          OneLoad = Boolean.valueOf(matcher.group(1));
           continue;
         }
       }

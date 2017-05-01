@@ -13,7 +13,15 @@ public class CityObjectDB : MonoBehaviour
   // メソッドとIDの対応付け辞書
   public Dictionary<long, MethodObject> MethodDict = new Dictionary<long, MethodObject>();
 
-  // 未知のメソッドをDBに登録
+  public void Clear()
+  {
+    foreach (Transform child in Manager.CityMaker.CitySpace.transform) {
+      Destroy(child.gameObject);
+    }
+    MethodDict.Clear();
+  }
+
+  // メソッドをDBに登録
   public void RegistUnknownMethod(MethodInfo info)
   {
     // 返値

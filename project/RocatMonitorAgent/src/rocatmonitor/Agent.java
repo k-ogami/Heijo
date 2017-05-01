@@ -21,7 +21,7 @@ import rocatmonitor.json.RootJSON;
 public class Agent
 {
 
-  public static final boolean DEBUG_NO_CONNECT = false;;
+  public static final boolean DEBUG_NO_CONNECT = false;
 
   public static ConfigReader ConfigReader = null;
   public static Monitor Monitor = null;
@@ -46,12 +46,12 @@ public class Agent
 
     // クラスパス以下にあるクラスを全走査して、パッケージ・クラス・メソッドの情報を得る
     CollectClassVisitor collector = CollectClassFile();
-
-    // パッケージ・クラス・メソッドの情報をビジュアライザに送信する
-    RootJSON json = new RootJSON();
-    json.MethodInfos = collector.MethodInfoList;
-    Agent.Connector.Send(json);
-
+    // OneLoadモード時、パッケージ・クラス・メソッドの情報をビジュアライザに送信する
+    if (ConfigReader.OneLoad) {
+      RootJSON json = new RootJSON();
+      json.MethodInfos = collector.MethodInfoList;
+      Agent.Connector.Send(json);
+    }
     // バイトコード書き換えのTransformerを追加
     Agent.Monitor = new Monitor();
     ByteTransformer transformer = new ByteTransformer(collector.MethodInfoMap);
@@ -137,12 +137,10 @@ public class Agent
       for (File p : path.listFiles()) {
         ReadFiles(p, classFileList, jarFileList);
       }
-    }
-    else {
+    } else {
       if (path.getName().endsWith(".class")) {
         classFileList.add(path);
-      }
-      else if (path.getName().endsWith(".jar")) {
+      } else if (path.getName().endsWith(".jar")) {
         jarFileList.add(new JarFile(path));
       }
     }

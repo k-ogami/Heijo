@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import rocatmonitor.json.ExeTimeInfo;
+import rocatmonitor.json.MethodInfo;
 import rocatmonitor.json.RootJSON;
 
 public class Monitor
@@ -59,6 +60,8 @@ public class Monitor
   private static Map<Long, List<TimeFrame>> timeStackMap = new HashMap<Long, List<TimeFrame>>();
   // スレッド・メソッドごとの実行時間のマップ。送信先に教えるとクリアされる。<<スレッドID, メソッドID>, 実行時間>
   private static Map<ExeTimeKey, Long> exeTimeMap = new HashMap<ExeTimeKey, Long>();
+  // OneLoadモードでない時に使用。初めてロードされたクラスのメソッド情報のリスト。送信先に教えるとクリアされる
+  private static List<MethodInfo> newLoadMethodList = new LinkedList<MethodInfo>();
 
   private static Object lock = new Object();
   private static boolean isAlive = true;
@@ -164,6 +167,16 @@ public class Monitor
     }
   }
 
+  public static void RegistMethod(MethodInfo method)
+  {
+    if (!isAlive)
+      return;
+
+    synchronized (lock) {
+      newLoadMethodList.add(method);
+    }
+  }
+
   private static void AddExeTime(long threadID, long methodID, long time)
   {
     ExeTimeKey key = new ExeTimeKey(threadID, methodID);
@@ -179,6 +192,10 @@ public class Monitor
   {
     RootJSON json = new RootJSON();
     json.Time = time;
+    for (MethodInfo methodInfo : newLoadMethodList) {
+      json.MethodInfos.add(methodInfo);
+    }
+    newLoadMethodList.clear();
     for (Entry<ExeTimeKey, Long> entry : exeTimeMap.entrySet()) {
       json.ExeTimeInfos.add(new ExeTimeInfo(entry.getKey().ThreadID, entry.getKey().MethodID, entry.getValue()));
     }

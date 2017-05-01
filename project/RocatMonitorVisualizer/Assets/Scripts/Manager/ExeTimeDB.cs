@@ -18,6 +18,11 @@ public class ExeTimeDB : MonoBehaviour
     public ExeTimeInfo[] ExeTimeInfos;
   }
 
+  public void Clear()
+  {
+    timeDataList.Clear();
+  }
+
   public void RegistInfo(ExeTimeInfo[] infos, long time)
   {
     // データを追加
