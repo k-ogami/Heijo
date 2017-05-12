@@ -7,7 +7,6 @@ public class ExeTimeDB : MonoBehaviour
 
   public float MaxTime = 0;
   public float HeightHistory = 0;
-  public float Height = 0;
 
   private LinkedList<TimeData> timeDataList = new LinkedList<TimeData>();
   private float history = 0;
@@ -84,7 +83,7 @@ public class ExeTimeDB : MonoBehaviour
   {
     obj.Time = GetTime(obj, dic);
     float height;
-    height = history != 0 ? obj.Time / history * Height : 0;
+    height = history != 0 ? obj.Time / history * UI.HeightSlider.value : 0;
     return height;
   }
 

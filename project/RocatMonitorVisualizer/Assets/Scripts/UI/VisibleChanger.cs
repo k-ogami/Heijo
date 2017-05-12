@@ -21,18 +21,22 @@ public class VisibleChanger : MonoBehaviour
 
   private void CheckCursor()
   {
-    // レイを飛ばしてオブジェクトを取得
     CityObject cursored = null;
-    if (0 <= Input.mousePosition.x
-      && Input.mousePosition.x <= Screen.width
-      && 0 <= Input.mousePosition.y
-      && Input.mousePosition.y <= Screen.height) {
-      Ray ray = UI.CameraController.Camera.ScreenPointToRay(Input.mousePosition);
-      RaycastHit hit;
-      if (Physics.Raycast(ray, out hit, float.MaxValue, 1 << LayerMask.NameToLayer("VisibleCityObject"))) {
-        cursored = hit.collider.gameObject.GetComponent<CityObject>();
-     }
+
+    if (!UI.IsPointerOverUI()) {      
+      // レイを飛ばしてオブジェクトを取得
+      if (0 <= Input.mousePosition.x
+        && Input.mousePosition.x <= Screen.width
+        && 0 <= Input.mousePosition.y
+        && Input.mousePosition.y <= Screen.height) {
+        Ray ray = UI.CameraController.Camera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, float.MaxValue, 1 << LayerMask.NameToLayer("VisibleCityObject"))) {
+          cursored = hit.collider.gameObject.GetComponent<CityObject>();
+        }
+      }
     }
+
     // 選択中のオブジェクトが変化した場合
     if (CursoredObject != cursored) {
       time = 0;
