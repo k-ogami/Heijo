@@ -85,6 +85,14 @@ public class VisibleChanger : MonoBehaviour
 
   private void RecSetChildrenVisible(CityObject obj, bool visible)
   {
+    foreach (CityObject child in obj.GetChildren()) {
+      child.SetVisible(visible);
+      if (child.ChildrenVisivle) {
+        RecSetChildrenVisible(child, visible);
+      }
+    }
+
+    /*
     foreach (CityObject child in obj.PackageChildren.Values) {
       child.Visible = visible;
       if (child.ChildrenVisivle) {
@@ -103,6 +111,7 @@ public class VisibleChanger : MonoBehaviour
         RecSetChildrenVisible(child, visible);
       }
     }
+    */
   }
 
   private void SetText()

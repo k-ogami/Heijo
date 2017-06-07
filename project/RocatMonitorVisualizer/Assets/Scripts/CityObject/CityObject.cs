@@ -21,44 +21,16 @@ public class CityObject : MonoBehaviour
   // キーはID
   public Dictionary<long, MethodObject> MethodChildren = new Dictionary<long, MethodObject>();
 
+  public float Height_0_1 = 0;
+
   private GameObject heighter = null;
 
-  /*
-  protected void Update()
+  public void SetHeight(float height_0_1)
   {
-    GetComponent<Renderer>().enabled = Visible;
-    heighter.GetComponent<Renderer>().enabled = Visible && !ChildrenVisivle;
-    // レイヤーを変更
-    if (Visible) {
-      gameObject.layer = LayerMask.NameToLayer("VisibleCityObject");
-    }
-    else {
-      gameObject.layer = LayerMask.NameToLayer("NonVisibleCityObject");
-    }
-    // 高さの変更
-    if (Visible) {
-      if (Height <= 0) {
-        heighter.GetComponent<Renderer>().enabled = false;
-      }
-      else {
-        // サイズの更新
-        Vector3 scale = heighter.transform.localScale;
-        if (transform.localScale.y != 0) {
-          scale.y = Height / transform.localScale.y;
-        }
-        heighter.transform.localScale = scale;
-        // 座標の更新
-        Vector3 pos = transform.position;
-        pos.y += (transform.lossyScale.y + heighter.transform.lossyScale.y) / 2;
-        heighter.transform.position = pos;
-      }
-    }
-  }
-  */
+    Height_0_1 = height_0_1;
+    Height = height_0_1 * UI.HeightSlider.Slider.value;
 
-  public void SetHeight(float height)
-  {
-    Height = height;
+    heighter.GetComponent<Renderer>().enabled = Visible && !ChildrenVisivle && 0 < Height;
 
     if (Visible) {
       if (Height <= 0) {
@@ -78,13 +50,12 @@ public class CityObject : MonoBehaviour
     }
   }
 
-  public void SetVisible(bool visible, bool childrenVisible)
+  public void SetVisible(bool visible)
   {
     Visible = visible;
-    ChildrenVisivle = childrenVisible;
 
     GetComponent<Renderer>().enabled = Visible;
-    heighter.GetComponent<Renderer>().enabled = Visible && !ChildrenVisivle;
+    heighter.GetComponent<Renderer>().enabled = Visible && !ChildrenVisivle && 0 < Height;
 
     // レイヤーを変更
     if (Visible) {
@@ -116,14 +87,21 @@ public class CityObject : MonoBehaviour
   {
     Vector3 delta = position - transform.position;
     transform.position = position;
-    foreach (CityObject child in PackageChildren.Values) {
+    foreach (CityObject child in GetChildren()) {
       child.MoveTo(child.transform.position + delta);
+    }
+  }
+
+  public IEnumerable<CityObject> GetChildren()
+  {
+    foreach (CityObject child in PackageChildren.Values) {
+      yield return child;
     }
     foreach (CityObject child in ClassChildren.Values) {
-      child.MoveTo(child.transform.position + delta);
+      yield return child;
     }
     foreach (CityObject child in MethodChildren.Values) {
-      child.MoveTo(child.transform.position + delta);
+      yield return child;
     }
   }
 
@@ -137,6 +115,7 @@ public class CityObject : MonoBehaviour
   protected static T CreatePrefab<T>() where T : CityObject
   {
     T obj = GameObject.CreatePrimitive(PrimitiveType.Cube).AddComponent<T>();
+    obj.gameObject.layer = LayerMask.NameToLayer("VisibleCityObject");
     GameObject heighter = GameObject.CreatePrimitive(PrimitiveType.Cube);
     heighter.transform.parent = obj.transform;
     heighter.GetComponent<Renderer>().material = Manager.CityMaker.HeighterMaterial;

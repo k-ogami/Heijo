@@ -48,12 +48,10 @@ public class ExeTimeDB : MonoBehaviour
         if (!dic.ContainsKey(info.MethodID)) {
           dic[info.MethodID] = new Dictionary<long, long>();
           dic[info.MethodID][info.ThreadID] = info.ExeTime;
-        }
-        else {
+        } else {
           if (!dic[info.MethodID].ContainsKey(info.ThreadID)) {
             dic[info.MethodID].Add(info.ThreadID, info.ExeTime);
-          }
-          else {
+          } else {
             dic[info.MethodID][info.ThreadID] += info.ExeTime;
           }
         }
@@ -67,14 +65,8 @@ public class ExeTimeDB : MonoBehaviour
 
   private void RecSetHeight(CityObject obj, Dictionary<long, Dictionary<long, long>> dic)
   {
-    obj.Height = GetHeight(obj, dic);
-    foreach (CityObject child in obj.PackageChildren.Values) {
-      RecSetHeight(child, dic);
-    }
-    foreach (CityObject child in obj.ClassChildren.Values) {
-      RecSetHeight(child, dic);
-    }
-    foreach (CityObject child in obj.MethodChildren.Values) {
+    obj.SetHeight(GetHeight(obj, dic));
+    foreach (CityObject child in obj.GetChildren()) {
       RecSetHeight(child, dic);
     }
   }
@@ -83,7 +75,7 @@ public class ExeTimeDB : MonoBehaviour
   {
     obj.Time = GetTime(obj, dic);
     float height;
-    height = history != 0 ? obj.Time / history * UI.HeightSlider.value : 0;
+    height = history != 0 ? obj.Time / history : 0;
     return height;
   }
 
@@ -100,8 +92,7 @@ public class ExeTimeDB : MonoBehaviour
             if (dic[method].ContainsKey(thread)) {
               dic2[thread] = dic[method][thread];
             }
-          }
-          else {
+          } else {
             if (dic[method].ContainsKey(thread)) {
               dic2[thread] += dic[method][thread];
             }
@@ -129,15 +120,8 @@ public class ExeTimeDB : MonoBehaviour
     }
     if (obj.IsMethod) {
       list.AddLast(((MethodObject)obj).MethodID);
-    }
-    else {
-      foreach (CityObject child in obj.PackageChildren.Values) {
-        RecGetUnderMethodID(child, list);
-      }
-      foreach (CityObject child in obj.ClassChildren.Values) {
-        RecGetUnderMethodID(child, list);
-      }
-      foreach (CityObject child in obj.MethodChildren.Values) {
+    } else {
+      foreach (CityObject child in obj.GetChildren()) {
         RecGetUnderMethodID(child, list);
       }
     }

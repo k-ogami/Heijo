@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
@@ -9,14 +8,14 @@ public class UI : MonoBehaviour
   public static CameraController CameraController = null;
   public static VisibleChanger VisibleChanger = null;
   public static Descriptor Descriptor = null;
-  public static Slider HeightSlider = null;
+  public static HeightSlider HeightSlider = null;
 
   private void Awake()
   {
     CameraController = GetComponent<CameraController>();
     VisibleChanger = GetComponent<VisibleChanger>();
     Descriptor = GetComponentInChildren<Descriptor>();
-    HeightSlider = GetComponentInChildren<Slider>();
+    HeightSlider = GetComponentInChildren<HeightSlider>();
   }
 
   // マウスカーソルがUIの上にあるか否か

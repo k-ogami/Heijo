@@ -89,15 +89,7 @@ public class CityMaker : MonoBehaviour
     if (obj.ChildrenVisivle == false) {
       visible = false;
     }
-    foreach (CityObject child in obj.PackageChildren.Values) {
-      child.Visible = visible;
-      RecSetVisible(child, visible);
-    }
-    foreach (CityObject child in obj.ClassChildren.Values) {
-      child.Visible = visible;
-      RecSetVisible(child, visible);
-    }
-    foreach (CityObject child in obj.MethodChildren.Values) {
+    foreach (CityObject child in obj.GetChildren()) {
       child.Visible = visible;
       RecSetVisible(child, visible);
     }
@@ -106,13 +98,7 @@ public class CityMaker : MonoBehaviour
   private void ResetPos(CityObject obj)
   {
     obj.transform.position = Vector3.zero;
-    foreach (CityObject child in obj.PackageChildren.Values) {
-      ResetPos(child);
-    }
-    foreach (CityObject child in obj.ClassChildren.Values) {
-      ResetPos(child);
-    }
-    foreach (CityObject child in obj.MethodChildren.Values) {
+    foreach (CityObject child in obj.GetChildren()) {
       ResetPos(child);
     }
   }
@@ -121,16 +107,9 @@ public class CityMaker : MonoBehaviour
   {
     if (obj.IsMethod) {
       obj.Width = MethodWidth;
-    }
-    else {
+    } else {
       // すべての子に再帰
-      foreach (CityObject child in obj.PackageChildren.Values) {
-        RecPlace(child);
-      }
-      foreach (CityObject child in obj.ClassChildren.Values) {
-        RecPlace(child);
-      }
-      foreach (CityObject child in obj.MethodChildren.Values) {
+      foreach (CityObject child in obj.GetChildren()) {
         RecPlace(child);
       }
       // 子を配置していく
@@ -141,13 +120,7 @@ public class CityMaker : MonoBehaviour
   private void RecSetSize(CityObject obj)
   {
     obj.transform.localScale = new Vector3(obj.Width, 1, obj.Width);
-    foreach (CityObject child in obj.PackageChildren.Values) {
-      RecSetSize(child);
-    }
-    foreach (CityObject child in obj.ClassChildren.Values) {
-      RecSetSize(child);
-    }
-    foreach (CityObject child in obj.MethodChildren.Values) {
+    foreach (CityObject child in obj.GetChildren()) {
       RecSetSize(child);
     }
   }
@@ -159,13 +132,7 @@ public class CityMaker : MonoBehaviour
     obj.transform.position = new Vector3(pos.x, height + Threashold / 2, pos.z);
     obj.transform.localScale = new Vector3(scale.x, Threashold, scale.z);
     float next = height + Threashold;
-    foreach (CityObject child in obj.PackageChildren.Values) {
-      RecSetThreashold(child, next);
-    }
-    foreach (CityObject child in obj.ClassChildren.Values) {
-      RecSetThreashold(child, next);
-    }
-    foreach (CityObject child in obj.MethodChildren.Values) {
+    foreach (CityObject child in obj.GetChildren()) {
       RecSetThreashold(child, next);
     }
   }
@@ -176,15 +143,13 @@ public class CityMaker : MonoBehaviour
     Color color = Color.black;
     if (obj.IsPackage) {
       color = PackageColor;
-    }
-    else if (obj.IsClass) {
+    } else if (obj.IsClass) {
       color = ClassColor;
-    }
-    else if (obj.IsMethod) {
+    } else if (obj.IsMethod) {
       color = MethodColor;
     }
     for (int i = 0; i < depth; i++) {
-      color.r += (1f - color.r) * (1f -  ReduceColorRate);
+      color.r += (1f - color.r) * (1f - ReduceColorRate);
       color.g += (1f - color.g) * (1f - ReduceColorRate);
       color.b += (1f - color.b) * (1f - ReduceColorRate);
       if (1 < color.r) {
@@ -206,8 +171,7 @@ public class CityMaker : MonoBehaviour
       foreach (CityObject child in obj.ClassChildren.Values) {
         RecSetColor(child);
       }
-    }
-    else if (obj.IsClass) {
+    } else if (obj.IsClass) {
       foreach (CityObject child in obj.ClassChildren.Values) {
         RecSetColor(child, depth + 1);
       }
@@ -221,13 +185,7 @@ public class CityMaker : MonoBehaviour
   {
     // 子をサイズの大きさ順でソートする
     List<CityObject> sizeSortedObjects = new List<CityObject>();
-    foreach (CityObject child in obj.PackageChildren.Values) {
-      sizeSortedObjects.Add(child);
-    }
-    foreach (CityObject child in obj.ClassChildren.Values) {
-      sizeSortedObjects.Add(child);
-    }
-    foreach (CityObject child in obj.MethodChildren.Values) {
+    foreach (CityObject child in obj.GetChildren()) {
       sizeSortedObjects.Add(child);
     }
     sizeSortedObjects.Sort(CompareByObjSize);
@@ -262,15 +220,13 @@ public class CityMaker : MonoBehaviour
             flag = true;
             break;
           }
-        }
-        else {
+        } else {
           lines[lines.Count - 1].Add(sizeSortedObjects[i]);
         }
       }
       if (flag) {
         continue;
-      }
-      else {
+      } else {
         result_lines = lines;
         break;
       }
@@ -295,11 +251,9 @@ public class CityMaker : MonoBehaviour
   {
     if (a.Width == b.Width) {
       return 0;
-    }
-    else if (a.Width < b.Width) {
+    } else if (a.Width < b.Width) {
       return 1;
-    }
-    else {
+    } else {
       return -1;
     }
   }
