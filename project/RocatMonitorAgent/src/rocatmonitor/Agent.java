@@ -24,7 +24,7 @@ public class Agent
   public static final boolean DEBUG_NO_CONNECT = false;
 
   public static ConfigReader ConfigReader = null;
-  public static Monitor Monitor = null;
+  public static Monitor Monitor = null; // これいる？
   public static Connector Connector = null;
   public static IntervalThread IntervalThread = null;
 

@@ -23,6 +23,7 @@ public class CityObject : MonoBehaviour
 
   private GameObject heighter = null;
 
+  /*
   protected void Update()
   {
     GetComponent<Renderer>().enabled = Visible;
@@ -53,6 +54,45 @@ public class CityObject : MonoBehaviour
       }
     }
   }
+  */
+
+  public void SetHeight(float height)
+  {
+    Height = height;
+
+    if (Visible) {
+      if (Height <= 0) {
+        heighter.GetComponent<Renderer>().enabled = false;
+      } else {
+        // サイズの更新
+        Vector3 scale = heighter.transform.localScale;
+        if (transform.localScale.y != 0) {
+          scale.y = Height / transform.localScale.y;
+        }
+        heighter.transform.localScale = scale;
+        // 座標の更新
+        Vector3 pos = transform.position;
+        pos.y += (transform.lossyScale.y + heighter.transform.lossyScale.y) / 2;
+        heighter.transform.position = pos;
+      }
+    }
+  }
+
+  public void SetVisible(bool visible, bool childrenVisible)
+  {
+    Visible = visible;
+    ChildrenVisivle = childrenVisible;
+
+    GetComponent<Renderer>().enabled = Visible;
+    heighter.GetComponent<Renderer>().enabled = Visible && !ChildrenVisivle;
+
+    // レイヤーを変更
+    if (Visible) {
+      gameObject.layer = LayerMask.NameToLayer("VisibleCityObject");
+    } else {
+      gameObject.layer = LayerMask.NameToLayer("NonVisibleCityObject");
+    }
+  }
 
   // 子を追加して紐付けする
   public void AddChild(CityObject child)
@@ -63,11 +103,9 @@ public class CityObject : MonoBehaviour
     // 子を追加
     if (child.IsPackage) {
       PackageChildren.Add(child.name, (PackageObject)child);
-    }
-    else if (child.IsClass) {
+    } else if (child.IsClass) {
       ClassChildren.Add(child.name, (ClassObject)child);
-    }
-    else if (child.IsMethod) {
+    } else if (child.IsMethod) {
       MethodObject method = (MethodObject)child;
       MethodChildren.Add(method.MethodID, method);
     }
