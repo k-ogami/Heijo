@@ -38,94 +38,83 @@ public class ExeTimeDB : MonoBehaviour
   public void SetHeight()
   {
     // <メソッドID, <スレッドID, 実行時間>>
-    Dictionary<long, Dictionary<long, long>> dic = new Dictionary<long, Dictionary<long, long>>();
+    Dictionary<long, Dictionary<long, long>> methodDic = new Dictionary<long, Dictionary<long, long>>();
 
     // 時間範囲内のメソッド毎スレッド毎の実行時間を取得
     long last = timeDataList.Last.Value.Time_ns;
     long length = (long)(HeightHistory * Mathf.Pow(10, 9));
     for (LinkedListNode<TimeData> i = timeDataList.Last; i != null && last - i.Value.Time_ns < length; i = i.Previous) {
       foreach (ExeTimeInfo info in i.Value.ExeTimeInfos) {
-        if (!dic.ContainsKey(info.MethodID)) {
-          dic[info.MethodID] = new Dictionary<long, long>();
-          dic[info.MethodID][info.ThreadID] = info.ExeTime;
+        if (!methodDic.ContainsKey(info.MethodID)) {
+          methodDic[info.MethodID] = new Dictionary<long, long>();
+          methodDic[info.MethodID][info.ThreadID] = info.ExeTime;
         } else {
-          if (!dic[info.MethodID].ContainsKey(info.ThreadID)) {
-            dic[info.MethodID].Add(info.ThreadID, info.ExeTime);
+          if (!methodDic[info.MethodID].ContainsKey(info.ThreadID)) {
+            methodDic[info.MethodID].Add(info.ThreadID, info.ExeTime);
           } else {
-            dic[info.MethodID][info.ThreadID] += info.ExeTime;
+            methodDic[info.MethodID][info.ThreadID] += info.ExeTime;
           }
         }
       }
       // 保有時間の更新
       history = last - i.Value.Time_ns;
     }
-    // オブジェクトの高さを設定
-    RecSetHeight(Manager.CityObjectDB.DefaultPackage, dic);
-  }
 
-  private void RecSetHeight(CityObject obj, Dictionary<long, Dictionary<long, long>> dic)
-  {
-    obj.SetHeight(GetHeight(obj, dic));
-    foreach (CityObject child in obj.GetChildren()) {
-      RecSetHeight(child, dic);
+    // 高さをリセット
+    RecResetHeight(Manager.CityObjectDB.DefaultPackage);
+
+    // <オブジェクトID, <スレッドID, 実行時間>>
+    Dictionary<long, Dictionary<long, long>> objDic = new Dictionary<long, Dictionary<long, long>>();
+
+    // 実行されたメソッドを走査し、自身および親オブジェクトにオブジェクト毎スレッド毎の実行時間を加算していく
+    foreach (KeyValuePair<long, Dictionary<long, long>> pair in methodDic) {
+      RecAddExeTimeToParents(objDic, pair.Value, Manager.CityObjectDB.MethodDict[pair.Key]);
+    }
+
+    // オブジェクトの高さを設定
+    foreach (KeyValuePair<long, Dictionary<long, long>> pair in objDic) {
+      CityObject obj = Manager.CityObjectDB.ObjectDict[pair.Key];
+      // 各スレッドで最も長い実行時間から高さを算出
+      long time = 0;
+      foreach (long t in pair.Value.Values) {
+        if (time < t) {
+          time = t;
+        }
+      }
+      obj.Time = time;
+      // スレッド数もここで更新
+      obj.ThreadNum = pair.Value.Count;
+      // 高さを設定
+      float height = history != 0 ? obj.Time / history : 0;
+      Manager.CityObjectDB.ObjectDict[pair.Key].SetHeight(height);
     }
   }
 
-  private float GetHeight(CityObject obj, Dictionary<long, Dictionary<long, long>> dic)
+  private void RecAddExeTimeToParents(Dictionary<long, Dictionary<long, long>> objDic, Dictionary<long, long> data, CityObject obj)
   {
-    obj.Time = GetTime(obj, dic);
-    float height;
-    height = history != 0 ? obj.Time / history : 0;
-    return height;
-  }
-
-  private long GetTime(CityObject obj, Dictionary<long, Dictionary<long, long>> dic)
-  {
-    // オブジェクト以下にあるメソッドID（あるいは自身のメソッドID）を再帰的に取得
-    LinkedList<long> methods = RecGetUnderMethodID(obj);
-    // スレッド毎時間に変換
-    Dictionary<long, long> dic2 = new Dictionary<long, long>();
-    foreach (long method in methods) {
-      if (dic.ContainsKey(method)) {
-        foreach (long thread in dic[method].Keys) {
-          if (!dic2.ContainsKey(thread)) {
-            if (dic[method].ContainsKey(thread)) {
-              dic2[thread] = dic[method][thread];
-            }
-          } else {
-            if (dic[method].ContainsKey(thread)) {
-              dic2[thread] += dic[method][thread];
-            }
-          }
+    if (!objDic.ContainsKey(obj.ID)) {
+      objDic[obj.ID] = new Dictionary<long, long>(data);
+    } else {
+      foreach (KeyValuePair<long, long> pair in data) {
+        if (!objDic[obj.ID].ContainsKey(pair.Key)) {
+          objDic[obj.ID][pair.Key] = pair.Value;
+        } else {
+          objDic[obj.ID][pair.Key] += pair.Value;
         }
       }
     }
-    // 各スレッドで最も長い実行時間から高さを算出
-    long time = 0;
-    foreach (long t in dic2.Values) {
-      if (time < t) {
-        time = t;
-      }
+    // 親に再帰
+    if (obj.Parent != null) {
+      RecAddExeTimeToParents(objDic, data, obj.Parent);
     }
-    // スレッド数もここで更新
-    obj.ThreadNum = dic2.Count;
-
-    return time;
   }
-
-  private LinkedList<long> RecGetUnderMethodID(CityObject obj, LinkedList<long> list = null)
+  
+  private void RecResetHeight(CityObject obj)
   {
-    if (list == null) {
-      list = new LinkedList<long>();
+    obj.SetHeight(0);
+    foreach (CityObject child in obj.GetChildren()) {
+      RecResetHeight(child);
     }
-    if (obj.IsMethod) {
-      list.AddLast(((MethodObject)obj).MethodID);
-    } else {
-      foreach (CityObject child in obj.GetChildren()) {
-        RecGetUnderMethodID(child, list);
-      }
-    }
-    return list;
   }
-
+  
 }

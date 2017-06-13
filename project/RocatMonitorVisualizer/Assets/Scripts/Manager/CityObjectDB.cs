@@ -13,6 +13,9 @@ public class CityObjectDB : MonoBehaviour
   // メソッドとIDの対応付け辞書
   public Dictionary<long, MethodObject> MethodDict = new Dictionary<long, MethodObject>();
 
+  // オブジェクトとメソッドとIDの対応付け辞書
+  public Dictionary<long, CityObject> ObjectDict = new Dictionary<long, CityObject>();
+
   public void Clear()
   {
     foreach (Transform child in Manager.CityMaker.CitySpace.transform) {

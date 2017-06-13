@@ -5,6 +5,9 @@ using System.Collections.Generic;
 public class CityObject : MonoBehaviour
 {
 
+  // MethodIDとは別のIDを振り分ける
+  public long ID = 0;
+
   public float Width = 0;
   public float Height = 0;
   public long Time = 0;
@@ -18,12 +21,14 @@ public class CityObject : MonoBehaviour
   public Dictionary<string, PackageObject> PackageChildren = new Dictionary<string, PackageObject>();
   // キーはクラス名
   public Dictionary<string, ClassObject> ClassChildren = new Dictionary<string, ClassObject>();
-  // キーはID
+  // キーはMethodID
   public Dictionary<long, MethodObject> MethodChildren = new Dictionary<long, MethodObject>();
 
   public float Height_0_1 = 0;
 
   private GameObject heighter = null;
+
+  private static int id_iterator = 0;
 
   public void SetHeight(float height_0_1)
   {
@@ -121,6 +126,11 @@ public class CityObject : MonoBehaviour
     heighter.GetComponent<Renderer>().material = Manager.CityMaker.HeighterMaterial;
     heighter.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.Off;
     obj.heighter = heighter;
+
+    // IDを付与しDBに登録
+    obj.ID = id_iterator++;
+    Manager.CityObjectDB.ObjectDict[obj.ID] = obj;
+
     return obj;
   }
 
