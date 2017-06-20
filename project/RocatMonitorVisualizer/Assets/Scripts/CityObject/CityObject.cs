@@ -34,6 +34,7 @@ public class CityObject : MonoBehaviour
   {
     Height_0_1 = height_0_1;
     Height = height_0_1 * UI.HeightSlider.Slider.value;
+    if (0 < Height && Height <= Manager.ExeTimeDB.MinHeight) Height = Manager.ExeTimeDB.MinHeight;
 
     heighter.GetComponent<Renderer>().enabled = Visible && !ChildrenVisivle && 0 < Height;
 

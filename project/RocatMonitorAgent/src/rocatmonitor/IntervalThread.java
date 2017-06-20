@@ -7,6 +7,8 @@ public class IntervalThread extends Thread
 
   private int interval_ms = 0;
 
+  private boolean alive = false;
+
   public IntervalThread(int interval_ms)
   {
     this.interval_ms = interval_ms;
@@ -15,17 +17,27 @@ public class IntervalThread extends Thread
   @Override
   public void run()
   {
-    while (true) {
+    alive = true;
+
+    while (alive) {
       try {
         Monitor.Interval();
         Thread.sleep(interval_ms);
       } catch (IOException e) {
-        System.err.println("RocatMonitorAgent:データ送信に失敗しました。監視を中断します。");
+        if (alive) {
+          // System.err.println("RocatMonitorAgent:データ送信に失敗しました。監視を中断します。");
+          System.err.println("RocatMonitorAgent:Connection failed.");
+        }
         return;
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        return;
       }
     }
+  }
+
+  public void Destroy()
+  {
+    alive = false;
   }
 
 }

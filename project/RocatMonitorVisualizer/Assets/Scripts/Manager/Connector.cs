@@ -98,13 +98,8 @@ public class Connector : MonoBehaviour
   private void ThreadLoop()
   {
     while (true) {
-      try {
-        Accept();  // 接続が完了するまでブロック
-        Receive(); // 受信ループ。通信が切断されるまでブロック
-      }
-      catch (Exception e) {
-        print(e);
-      }
+      Accept();  // 接続が完了するまでブロック
+      Receive(); // 受信ループ。通信が切断されるまでブロック
     }
   }
 
@@ -165,7 +160,9 @@ public class Connector : MonoBehaviour
         int h_count = HEADER_SIZE;
         while (h_count != 0) {
           Thread.Sleep(1);
-          h_count -= stream.Read(header, HEADER_SIZE - h_count, h_count);
+          int read = stream.Read(header, HEADER_SIZE - h_count, h_count);
+          h_count -= read;
+          if (read == 0) return;
         }
         payload_size = BitConverter.ToInt32(header, 0);
         if (PrintLog) {
@@ -182,7 +179,9 @@ public class Connector : MonoBehaviour
         byte[] payload = new byte[payload_size];
         while (p_count != 0) {
           Thread.Sleep(1);
-          p_count -= stream.Read(payload, payload_size - p_count, p_count);
+          int read = stream.Read(payload, payload_size - p_count, p_count);
+          p_count -= read;
+          if (read == 0) return;
         }
         text = Encoding.UTF8.GetString(payload);
         // JSONテキストをファイルとして保存する（デバッグ用）

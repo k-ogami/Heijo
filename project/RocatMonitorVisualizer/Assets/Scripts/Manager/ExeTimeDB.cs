@@ -7,6 +7,7 @@ public class ExeTimeDB : MonoBehaviour
 
   public float MaxTime = 0;
   public float HeightHistory = 0;
+  public float MinHeight = 0.01f;
 
   private LinkedList<TimeData> timeDataList = new LinkedList<TimeData>();
   private float history = 0;

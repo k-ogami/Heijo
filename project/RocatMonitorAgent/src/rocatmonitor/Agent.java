@@ -24,7 +24,7 @@ public class Agent
   public static final boolean DEBUG_NO_CONNECT = false;
 
   public static ConfigReader ConfigReader = null;
-  public static Monitor Monitor = null; // これいる？
+  public static Monitor Monitor = null;
   public static Connector Connector = null;
   public static IntervalThread IntervalThread = null;
 
@@ -39,7 +39,8 @@ public class Agent
       try {
         Agent.Connector.Connect(Agent.ConfigReader.Host, Agent.ConfigReader.Port);
       } catch (IOException e) {
-        System.err.println("RocatMonitorAgent:接続に失敗しました。監視を中断します。");
+        // System.err.println("RocatMonitorAgent:接続に失敗しました。監視を中断します。");
+        System.err.println("RocatMonitorAgent:Connection failed.");
         return;
       }
     }
@@ -60,6 +61,9 @@ public class Agent
     // 送信用スレッドを開始する
     IntervalThread = new IntervalThread(Agent.ConfigReader.Interval);
     IntervalThread.start();
+
+    // アプリケーション終了時の処理にフックする処理を追加
+    CreateShutdownHook();
   }
 
   public static boolean IsIgnoreClass(String classSig)
@@ -92,6 +96,29 @@ public class Agent
       pack.append(".");
     }
     return false;
+  }
+
+  private static void CreateShutdownHook()
+  {
+    Thread hook = new Thread()
+    {
+      public void run()
+      {
+        // スレッドを終了
+        if (Agent.IntervalThread != null) {
+          Agent.IntervalThread.Destroy();
+        }
+        // コネクションを切断
+        if (Agent.Connector != null && Agent.Connector.Socket != null && !Agent.Connector.Socket.isClosed()) {
+          try {
+            Agent.Connector.Socket.close();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+      }
+    };
+    Runtime.getRuntime().addShutdownHook(hook);
   }
 
   private static CollectClassVisitor CollectClassFile() throws IOException
