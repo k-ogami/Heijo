@@ -185,6 +185,7 @@ public class Monitor
     } else {
       Long value = exeTimeMap.get(key);
       value += time;
+      exeTimeMap.put(key, value);
     }
   }
 

@@ -26,9 +26,11 @@ public class CityObject : MonoBehaviour
 
   public float Height_0_1 = 0;
 
+  [System.NonSerialized]
+  public static int ID_iterator = 0;
+
   private GameObject heighter = null;
 
-  private static int id_iterator = 0;
 
   public void SetHeight(float height_0_1)
   {
@@ -129,7 +131,7 @@ public class CityObject : MonoBehaviour
     obj.heighter = heighter;
 
     // IDを付与しDBに登録
-    obj.ID = id_iterator++;
+    obj.ID = ID_iterator++;
     Manager.CityObjectDB.ObjectDict[obj.ID] = obj;
 
     return obj;

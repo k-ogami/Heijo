@@ -86,7 +86,9 @@ public class ExeTimeDB : MonoBehaviour
       // スレッド数もここで更新
       obj.ThreadNum = pair.Value.Count;
       // 高さを設定
-      float height = history != 0 ? obj.Time / history : 0;
+      float height;
+      height = history != 0 ? obj.Time / history : 0;
+      if (1 < height) height = 1;
       Manager.CityObjectDB.ObjectDict[pair.Key].SetHeight(height);
     }
   }
@@ -112,6 +114,7 @@ public class ExeTimeDB : MonoBehaviour
   
   private void RecResetHeight(CityObject obj)
   {
+    obj.Time = 0;
     obj.SetHeight(0);
     foreach (CityObject child in obj.GetChildren()) {
       RecResetHeight(child);
