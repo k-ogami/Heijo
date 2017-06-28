@@ -26,7 +26,7 @@ public class IntervalThread extends Thread
       } catch (IOException e) {
         if (alive) {
           // System.err.println("RocatMonitorAgent:データ送信に失敗しました。監視を中断します。");
-          System.err.println("RocatMonitorAgent:Connection failed.");
+          System.err.println("AgentError:Connection failed.");
         }
         return;
       } catch (InterruptedException e) {

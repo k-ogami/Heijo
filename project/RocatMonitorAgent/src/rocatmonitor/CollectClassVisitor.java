@@ -22,6 +22,7 @@ public class CollectClassVisitor extends ClassVisitor
   public CollectClassVisitor()
   {
     super(Opcodes.ASM5);
+
   }
 
   @Override

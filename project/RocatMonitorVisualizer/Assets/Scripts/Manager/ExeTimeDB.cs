@@ -114,6 +114,7 @@ public class ExeTimeDB : MonoBehaviour
   
   private void RecResetHeight(CityObject obj)
   {
+    obj.ThreadNum = 0; // スレッド数もここでリセット
     obj.Time = 0;
     obj.SetHeight(0);
     foreach (CityObject child in obj.GetChildren()) {

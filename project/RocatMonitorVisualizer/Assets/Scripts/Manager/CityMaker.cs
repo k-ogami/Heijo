@@ -42,7 +42,7 @@ public class CityMaker : MonoBehaviour
       Manager.CityObjectDB.DefaultPackage.transform.parent = CitySpace.transform;
       Manager.CityObjectDB.DefaultPackage.Visible = true;
       Manager.CityObjectDB.DefaultPackage.GetComponent<Renderer>().material.color = PackageColor;
-      CityObject.ID_iterator = 0;
+      CityObject.ID_iterator = 1; // デフォルトパッケージが0番目
     }
 
     bool remake = false;

@@ -9,8 +9,10 @@ import java.io.OutputStream;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Files;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -40,7 +42,7 @@ public class Agent
         Agent.Connector.Connect(Agent.ConfigReader.Host, Agent.ConfigReader.Port);
       } catch (IOException e) {
         // System.err.println("RocatMonitorAgent:接続に失敗しました。監視を中断します。");
-        System.err.println("RocatMonitorAgent:Connection failed.");
+        System.err.println("AgentError:Connection failed.");
         return;
       }
     }
@@ -128,8 +130,8 @@ public class Agent
     String[] paths = class_path.split(System.getProperty("path.separator"));
 
     // classファイル、jarファイルを再帰的に走査
-    List<File> classFiles = new LinkedList<File>();
-    List<JarFile> jarFiles = new LinkedList<JarFile>();
+    Set<String> classFiles = new HashSet<String>();
+    Set<String> jarFiles = new HashSet<String>();
     for (String path : paths) {
       ReadFiles(new File(path), classFiles, jarFiles);
     }
@@ -137,38 +139,41 @@ public class Agent
     CollectClassVisitor visitor = new CollectClassVisitor();
 
     // classファイルのバイトコードを調べる
-    for (File classFile : classFiles) {
-      byte[] bytes = Files.readAllBytes(classFile.toPath());
+    for (String classFile : classFiles) {
+      File file = new File(classFile);
+      byte[] bytes = Files.readAllBytes(file.toPath());
       ClassReader reader = new ClassReader(bytes);
       reader.accept(visitor, 0);
     }
 
     // jarファイル内にあるclassファイルのバイトコードを調べる
-    for (JarFile jarFile : jarFiles) {
-      for (JarEntry entry : Collections.list(jarFile.entries())) {
+    for (String jarFile : jarFiles) {
+      JarFile file = new JarFile(jarFile);
+      for (JarEntry entry : Collections.list(file.entries())) {
         if (entry.getName().endsWith(".class")) {
-          InputStream stream = jarFile.getInputStream(entry);
+          InputStream stream = file.getInputStream(entry);
           byte[] bytes = GetBytes(stream);
           ClassReader reader = new ClassReader(bytes);
           reader.accept(visitor, 0);
         }
       }
+      file.close();
     }
 
     return visitor;
   }
 
-  private static void ReadFiles(File path, List<File> classFileList, List<JarFile> jarFileList) throws IOException
+  private static void ReadFiles(File path, Set<String> classFileSet, Set<String> jarFileSet) throws IOException
   {
     if (path.isDirectory()) {
       for (File p : path.listFiles()) {
-        ReadFiles(p, classFileList, jarFileList);
+        ReadFiles(p, classFileSet, jarFileSet);
       }
     } else {
       if (path.getName().endsWith(".class")) {
-        classFileList.add(path);
+        classFileSet.add(path.getAbsolutePath());
       } else if (path.getName().endsWith(".jar")) {
-        jarFileList.add(new JarFile(path));
+        jarFileSet.add(path.getAbsolutePath());
       }
     }
   }

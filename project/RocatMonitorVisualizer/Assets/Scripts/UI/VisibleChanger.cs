@@ -16,7 +16,7 @@ public class VisibleChanger : MonoBehaviour
   private void Update()
   {
     CheckCursor();
-    ChangeByClick();
+    // ChangeByClick(); // 封印
   }
 
   private void CheckCursor()
