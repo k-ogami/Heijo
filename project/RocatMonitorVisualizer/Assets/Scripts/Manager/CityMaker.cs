@@ -6,6 +6,7 @@ public class CityMaker : MonoBehaviour
 {
 
   public string DefaultPackageName = null;
+  public GameObject HeigherObject = null;
 
   [Header("Placement")]
   public float MethodWidth = 0;
@@ -18,7 +19,6 @@ public class CityMaker : MonoBehaviour
   public Color PackageColor = Color.black;
   public Color ClassColor = Color.black;
   public Color MethodColor = Color.black;
-  public Material HeighterMaterial = null;
 
   // CityObject置き場
   [System.NonSerialized]

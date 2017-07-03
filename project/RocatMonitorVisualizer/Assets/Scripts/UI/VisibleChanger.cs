@@ -23,7 +23,7 @@ public class VisibleChanger : MonoBehaviour
   {
     CityObject cursored = null;
 
-    if (!UI.IsPointerOverUI()) {      
+    if (!UI.IsPointerOverUI()) {
       // レイを飛ばしてオブジェクトを取得
       if (0 <= Input.mousePosition.x
         && Input.mousePosition.x <= Screen.width
@@ -91,27 +91,6 @@ public class VisibleChanger : MonoBehaviour
         RecSetChildrenVisible(child, visible);
       }
     }
-
-    /*
-    foreach (CityObject child in obj.PackageChildren.Values) {
-      child.Visible = visible;
-      if (child.ChildrenVisivle) {
-        RecSetChildrenVisible(child, visible);
-      }
-    }
-    foreach (CityObject child in obj.ClassChildren.Values) {
-      child.Visible = visible;
-      if (child.ChildrenVisivle) {
-        RecSetChildrenVisible(child, visible);
-      }
-    }
-    foreach (CityObject child in obj.MethodChildren.Values) {
-      child.Visible = visible;
-      if (child.ChildrenVisivle) {
-        RecSetChildrenVisible(child, visible);
-      }
-    }
-    */
   }
 
   private void SetText()
@@ -123,7 +102,7 @@ public class VisibleChanger : MonoBehaviour
     else if (CursoredObject.IsClass) {
       str.Append("Class Name\t:" + CursoredObject.name);
     }
-    else  {
+    else {
       str.Append("Method Name\t:" + ((MethodObject)CursoredObject).GetPerfectName());
     }
     float rate = CursoredObject.Time / (Manager.ExeTimeDB.HeightHistory * Mathf.Pow(10, 9));

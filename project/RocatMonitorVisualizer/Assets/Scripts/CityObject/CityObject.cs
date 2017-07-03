@@ -30,7 +30,8 @@ public class CityObject : MonoBehaviour
   public static int ID_iterator = 0;
 
   private GameObject heighter = null;
-
+  private Renderer ownRenderer = null;
+  private Renderer heigherRenderer = null;
 
   public void SetHeight(float height_0_1)
   {
@@ -38,11 +39,11 @@ public class CityObject : MonoBehaviour
     Height = height_0_1 * UI.HeightSlider.Slider.value;
     if (0 < Height && Height <= Manager.ExeTimeDB.MinHeight) Height = Manager.ExeTimeDB.MinHeight;
 
-    heighter.GetComponent<Renderer>().enabled = Visible && !ChildrenVisivle && 0 < Height;
+    heigherRenderer.enabled = Visible && !ChildrenVisivle && 0 < Height;
 
     if (Visible) {
       if (Height <= 0) {
-        heighter.GetComponent<Renderer>().enabled = false;
+        heigherRenderer.enabled = false;
       } else {
         // サイズの更新
         Vector3 scale = heighter.transform.localScale;
@@ -62,8 +63,8 @@ public class CityObject : MonoBehaviour
   {
     Visible = visible;
 
-    GetComponent<Renderer>().enabled = Visible;
-    heighter.GetComponent<Renderer>().enabled = Visible && !ChildrenVisivle && 0 < Height;
+    ownRenderer.enabled = Visible;
+    heigherRenderer.enabled = Visible && !ChildrenVisivle && 0 < Height;
 
     // レイヤーを変更
     if (Visible) {
@@ -124,11 +125,12 @@ public class CityObject : MonoBehaviour
   {
     T obj = GameObject.CreatePrimitive(PrimitiveType.Cube).AddComponent<T>();
     obj.gameObject.layer = LayerMask.NameToLayer("VisibleCityObject");
-    GameObject heighter = GameObject.CreatePrimitive(PrimitiveType.Cube);
+    GameObject heighter = GameObject.Instantiate(Manager.CityMaker.HeigherObject);
     heighter.transform.parent = obj.transform;
-    heighter.GetComponent<Renderer>().material = Manager.CityMaker.HeighterMaterial;
-    heighter.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.Off;
     obj.heighter = heighter;
+
+    obj.ownRenderer = obj.GetComponent<Renderer>();
+    obj.heigherRenderer = heighter.GetComponent<Renderer>();
 
     // IDを付与しDBに登録
     obj.ID = ID_iterator++;

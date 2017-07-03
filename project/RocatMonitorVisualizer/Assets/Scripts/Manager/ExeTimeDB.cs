@@ -49,10 +49,12 @@ public class ExeTimeDB : MonoBehaviour
         if (!methodDic.ContainsKey(info.MethodID)) {
           methodDic[info.MethodID] = new Dictionary<long, long>();
           methodDic[info.MethodID][info.ThreadID] = info.ExeTime;
-        } else {
+        }
+        else {
           if (!methodDic[info.MethodID].ContainsKey(info.ThreadID)) {
             methodDic[info.MethodID].Add(info.ThreadID, info.ExeTime);
-          } else {
+          }
+          else {
             methodDic[info.MethodID][info.ThreadID] += info.ExeTime;
           }
         }
@@ -62,7 +64,7 @@ public class ExeTimeDB : MonoBehaviour
     }
 
     // 高さをリセット
-    RecResetHeight(Manager.CityObjectDB.DefaultPackage);
+    RecResetHeight();
 
     // <オブジェクトID, <スレッドID, 実行時間>>
     Dictionary<long, Dictionary<long, long>> objDic = new Dictionary<long, Dictionary<long, long>>();
@@ -97,11 +99,13 @@ public class ExeTimeDB : MonoBehaviour
   {
     if (!objDic.ContainsKey(obj.ID)) {
       objDic[obj.ID] = new Dictionary<long, long>(data);
-    } else {
+    }
+    else {
       foreach (KeyValuePair<long, long> pair in data) {
         if (!objDic[obj.ID].ContainsKey(pair.Key)) {
           objDic[obj.ID][pair.Key] = pair.Value;
-        } else {
+        }
+        else {
           objDic[obj.ID][pair.Key] += pair.Value;
         }
       }
@@ -111,15 +115,14 @@ public class ExeTimeDB : MonoBehaviour
       RecAddExeTimeToParents(objDic, data, obj.Parent);
     }
   }
-  
-  private void RecResetHeight(CityObject obj)
+
+  private void RecResetHeight()
   {
-    obj.ThreadNum = 0; // スレッド数もここでリセット
-    obj.Time = 0;
-    obj.SetHeight(0);
-    foreach (CityObject child in obj.GetChildren()) {
-      RecResetHeight(child);
+    foreach (CityObject obj in Manager.CityObjectDB.ObjectDict.Values) {
+      obj.ThreadNum = 0; // スレッド数もここでリセット
+      obj.Time = 0;
+      obj.SetHeight(0);
     }
   }
-  
+
 }

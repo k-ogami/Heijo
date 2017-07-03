@@ -1,8 +1,10 @@
 package rocatmonitor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -19,6 +21,8 @@ public class CollectClassVisitor extends ClassVisitor
   private String now_classSig = null;
   private long methodID_itrator = 0;
 
+  private Set<String> set = new HashSet<String>();
+
   public CollectClassVisitor()
   {
     super(Opcodes.ASM5);
@@ -28,11 +32,12 @@ public class CollectClassVisitor extends ClassVisitor
   @Override
   public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
   {
-    // 除外リストにあるパッケージのクラスは無視する
-    if (Agent.IsIgnoreClass(name)) {
+    // 除外リストにあるパッケージのクラスは無視する。 重複するクラスも無視する
+    if (Agent.IsIgnoreClass(name) || set.contains(name)) {
       now_classSig = null;
     } else {
       now_classSig = name;
+      set.add(name);
     }
   }
 
