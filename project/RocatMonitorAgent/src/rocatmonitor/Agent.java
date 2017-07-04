@@ -26,7 +26,6 @@ public class Agent
   public static final boolean DEBUG_NO_CONNECT = false;
 
   public static ConfigReader ConfigReader = null;
-  public static Monitor Monitor = null;
   public static Connector Connector = null;
   public static IntervalThread IntervalThread = null;
 
@@ -41,6 +40,7 @@ public class Agent
       try {
         Agent.Connector.Connect(Agent.ConfigReader.Host, Agent.ConfigReader.Port);
       } catch (IOException e) {
+        Monitor.IsAlive = false;
         // System.err.println("RocatMonitorAgent:接続に失敗しました。監視を中断します。");
         System.err.println("AgentError:Connection failed.");
         return;
@@ -56,7 +56,6 @@ public class Agent
       Agent.Connector.Send(json);
     }
     // バイトコード書き換えのTransformerを追加
-    Agent.Monitor = new Monitor();
     ByteTransformer transformer = new ByteTransformer(collector.MethodInfoMap);
     inst.addTransformer(transformer);
 

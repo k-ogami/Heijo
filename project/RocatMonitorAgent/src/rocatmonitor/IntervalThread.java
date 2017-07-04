@@ -25,6 +25,7 @@ public class IntervalThread extends Thread
         Thread.sleep(interval_ms);
       } catch (IOException e) {
         if (alive) {
+          Monitor.IsAlive = false;
           // System.err.println("RocatMonitorAgent:データ送信に失敗しました。監視を中断します。");
           System.err.println("AgentError:Connection failed.");
         }

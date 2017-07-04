@@ -56,6 +56,8 @@ public class Monitor
     public long MethodID;
   }
 
+  public static boolean IsAlive = true;
+
   // メソッドと開始時間のスタックトレース。<スレッドID, スタックトレース>
   private static Map<Long, List<TimeFrame>> timeStackMap = new HashMap<Long, List<TimeFrame>>();
   // スレッド・メソッドごとの実行時間のマップ。送信先に教えるとクリアされる。<<スレッドID, メソッドID>, 実行時間>
@@ -64,12 +66,11 @@ public class Monitor
   private static List<MethodInfo> newLoadMethodList = new LinkedList<MethodInfo>();
 
   private static Object lock = new Object();
-  private static boolean isAlive = true;
   private static long time = 0;
 
   public static void MethodEnter(long methodID)
   {
-    if (!isAlive) return;
+    if (!IsAlive) return;
 
     synchronized (lock) {
       // 時刻を更新
@@ -98,7 +99,7 @@ public class Monitor
 
   public static void MethodExit(long methodID)
   {
-    if (!isAlive) return;
+    if (!IsAlive) return;
 
     synchronized (lock) {
       // 時刻を更新
@@ -169,7 +170,7 @@ public class Monitor
 
   public static void RegistMethod(MethodInfo method)
   {
-    if (!isAlive)
+    if (!IsAlive)
       return;
 
     synchronized (lock) {
