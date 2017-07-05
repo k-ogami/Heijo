@@ -1,0 +1,666 @@
+﻿{
+  "ExeTimeInfos": [],
+  "MethodInfos": [
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE$1",
+      "MethodID": 227,
+      "MethodName": "<init>",
+      "MethodSig": "(Ljava/lang/String;ILjava/lang/String;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE$1",
+      "MethodID": 228,
+      "MethodName": "compute",
+      "MethodSig": "(IIII)D"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE$2",
+      "MethodID": 229,
+      "MethodName": "<init>",
+      "MethodSig": "(Ljava/lang/String;ILjava/lang/String;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE$2",
+      "MethodID": 230,
+      "MethodName": "compute",
+      "MethodSig": "(IIII)D"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE$3",
+      "MethodID": 231,
+      "MethodName": "<init>",
+      "MethodSig": "(Ljava/lang/String;ILjava/lang/String;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE$3",
+      "MethodID": 232,
+      "MethodName": "compute",
+      "MethodSig": "(IIII)D"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE$4",
+      "MethodID": 233,
+      "MethodName": "<init>",
+      "MethodSig": "(Ljava/lang/String;ILjava/lang/String;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE$4",
+      "MethodID": 234,
+      "MethodName": "compute",
+      "MethodSig": "(IIII)D"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE",
+      "MethodID": 235,
+      "MethodName": "values",
+      "MethodSig": "()[LFPGrowth$AssociationRule$METRIC_TYPE;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE",
+      "MethodID": 236,
+      "MethodName": "valueOf",
+      "MethodSig": "(Ljava/lang/String;)LFPGrowth$AssociationRule$METRIC_TYPE;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE",
+      "MethodID": 237,
+      "MethodName": "<init>",
+      "MethodSig": "(Ljava/lang/String;ILjava/lang/String;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE",
+      "MethodID": 238,
+      "MethodName": "compute",
+      "MethodSig": "(IIII)D"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE",
+      "MethodID": 239,
+      "MethodName": "toString",
+      "MethodSig": "()Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE",
+      "MethodID": 240,
+      "MethodName": "toStringMetric",
+      "MethodSig": "(IIII)Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE",
+      "MethodID": 241,
+      "MethodName": "toXML",
+      "MethodSig": "(IIII)Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE",
+      "MethodID": 242,
+      "MethodName": "<init>",
+      "MethodSig": "(Ljava/lang/String;ILjava/lang/String;LFPGrowth$1;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule$METRIC_TYPE",
+      "MethodID": 243,
+      "MethodName": "<clinit>",
+      "MethodSig": "()V"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 244,
+      "MethodName": "<init>",
+      "MethodSig": "(Ljava/util/Collection;Ljava/util/Collection;LFPGrowth$AssociationRule$METRIC_TYPE;IIII)V"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 245,
+      "MethodName": "getPremise",
+      "MethodSig": "()Ljava/util/Collection;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 246,
+      "MethodName": "getConsequence",
+      "MethodSig": "()Ljava/util/Collection;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 247,
+      "MethodName": "getMetricType",
+      "MethodSig": "()LFPGrowth$AssociationRule$METRIC_TYPE;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 248,
+      "MethodName": "getMetricValue",
+      "MethodSig": "()D"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 249,
+      "MethodName": "getPremiseSupport",
+      "MethodSig": "()I"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 250,
+      "MethodName": "getConsequenceSupport",
+      "MethodSig": "()I"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 251,
+      "MethodName": "getTotalSupport",
+      "MethodSig": "()I"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 252,
+      "MethodName": "getTotalTransactions",
+      "MethodSig": "()I"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 253,
+      "MethodName": "compareTo",
+      "MethodSig": "(LFPGrowth$AssociationRule;)I"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 254,
+      "MethodName": "equals",
+      "MethodSig": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 255,
+      "MethodName": "containsItems",
+      "MethodSig": "(Ljava/util/ArrayList;Z)Z"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 256,
+      "MethodName": "toString",
+      "MethodSig": "()Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 257,
+      "MethodName": "toXML",
+      "MethodSig": "()Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 258,
+      "MethodName": "nextSubset",
+      "MethodSig": "([Z)V"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 259,
+      "MethodName": "getPremise",
+      "MethodSig": "(LFPGrowth$FrequentBinaryItemSet;[Z)Ljava/util/Collection;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 260,
+      "MethodName": "getConsequence",
+      "MethodSig": "(LFPGrowth$FrequentBinaryItemSet;[Z)Ljava/util/Collection;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 261,
+      "MethodName": "generateRulesBruteForce",
+      "MethodSig": "(LFPGrowth$FrequentItemSets;LFPGrowth$AssociationRule$METRIC_TYPE;DIII)Ljava/util/List;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 262,
+      "MethodName": "pruneRules",
+      "MethodSig": "(Ljava/util/List;Ljava/util/ArrayList;Z)Ljava/util/List;"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 263,
+      "MethodName": "compareTo",
+      "MethodSig": "(Ljava/lang/Object;)I"
+    },
+    {
+      "ClassSig": "FPGrowth$AssociationRule",
+      "MethodID": 264,
+      "MethodName": "<clinit>",
+      "MethodSig": "()V"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 265,
+      "MethodName": "<init>",
+      "MethodSig": "(Lcore/Attribute;I)V"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 266,
+      "MethodName": "increaseFrequency",
+      "MethodSig": "(I)V"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 267,
+      "MethodName": "decreaseFrequency",
+      "MethodSig": "(I)V"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 268,
+      "MethodName": "increaseFrequency",
+      "MethodSig": "()V"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 269,
+      "MethodName": "decreaseFrequency",
+      "MethodSig": "()V"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 270,
+      "MethodName": "getFrequency",
+      "MethodSig": "()I"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 271,
+      "MethodName": "getAttribute",
+      "MethodSig": "()Lcore/Attribute;"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 272,
+      "MethodName": "getValueIndex",
+      "MethodSig": "()I"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 273,
+      "MethodName": "toString",
+      "MethodSig": "()Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 274,
+      "MethodName": "toString",
+      "MethodSig": "(Z)Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 275,
+      "MethodName": "toXML",
+      "MethodSig": "()Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 276,
+      "MethodName": "compareTo",
+      "MethodSig": "(LFPGrowth$BinaryItem;)I"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 277,
+      "MethodName": "equals",
+      "MethodSig": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 278,
+      "MethodName": "hashCode",
+      "MethodSig": "()I"
+    },
+    {
+      "ClassSig": "FPGrowth$BinaryItem",
+      "MethodID": 279,
+      "MethodName": "compareTo",
+      "MethodSig": "(Ljava/lang/Object;)I"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeNode",
+      "MethodID": 280,
+      "MethodName": "<init>",
+      "MethodSig": "(LFPGrowth$FPTreeNode;LFPGrowth$BinaryItem;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeNode",
+      "MethodID": 281,
+      "MethodName": "addItemSet",
+      "MethodSig": "(Ljava/util/Collection;Ljava/util/Map;I)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeNode",
+      "MethodID": 282,
+      "MethodName": "increaseProjectedCount",
+      "MethodSig": "(II)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeNode",
+      "MethodID": 283,
+      "MethodName": "removeProjectedCount",
+      "MethodSig": "(I)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeNode",
+      "MethodID": 284,
+      "MethodName": "getProjectedCount",
+      "MethodSig": "(I)I"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeNode",
+      "MethodID": 285,
+      "MethodName": "getParent",
+      "MethodSig": "()LFPGrowth$FPTreeNode;"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeNode",
+      "MethodID": 286,
+      "MethodName": "getItem",
+      "MethodSig": "()LFPGrowth$BinaryItem;"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeNode",
+      "MethodID": 287,
+      "MethodName": "toString",
+      "MethodSig": "(I)Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeNode",
+      "MethodID": 288,
+      "MethodName": "toString",
+      "MethodSig": "(Ljava/lang/String;I)Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeNode",
+      "MethodID": 289,
+      "MethodName": "assignIDs",
+      "MethodSig": "(I)I"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeNode",
+      "MethodID": 290,
+      "MethodName": "graphFPTree",
+      "MethodSig": "(Ljava/lang/StringBuffer;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeRoot$Header",
+      "MethodID": 291,
+      "MethodName": "<init>",
+      "MethodSig": "()V"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeRoot$Header",
+      "MethodID": 292,
+      "MethodName": "addToList",
+      "MethodSig": "(LFPGrowth$FPTreeNode;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeRoot$Header",
+      "MethodID": 293,
+      "MethodName": "getHeaderList",
+      "MethodSig": "()Ljava/util/List;"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeRoot$Header",
+      "MethodID": 294,
+      "MethodName": "getProjectedCounts",
+      "MethodSig": "()LFPGrowth$ShadowCounts;"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeRoot",
+      "MethodID": 295,
+      "MethodName": "<init>",
+      "MethodSig": "()V"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeRoot",
+      "MethodID": 296,
+      "MethodName": "addItemSet",
+      "MethodSig": "(Ljava/util/Collection;I)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeRoot",
+      "MethodID": 297,
+      "MethodName": "getHeaderTable",
+      "MethodSig": "()Ljava/util/Map;"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeRoot",
+      "MethodID": 298,
+      "MethodName": "isEmpty",
+      "MethodSig": "(I)Z"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeRoot",
+      "MethodID": 299,
+      "MethodName": "toString",
+      "MethodSig": "(Ljava/lang/String;I)Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeRoot",
+      "MethodID": 300,
+      "MethodName": "printHeaderTable",
+      "MethodSig": "(I)Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$FPTreeRoot",
+      "MethodID": 301,
+      "MethodName": "graphHeaderTable",
+      "MethodSig": "(Ljava/lang/StringBuffer;I)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentBinaryItemSet",
+      "MethodID": 302,
+      "MethodName": "<init>",
+      "MethodSig": "(Ljava/util/ArrayList;I)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentBinaryItemSet",
+      "MethodID": 303,
+      "MethodName": "addItem",
+      "MethodSig": "(LFPGrowth$BinaryItem;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentBinaryItemSet",
+      "MethodID": 304,
+      "MethodName": "setSupport",
+      "MethodSig": "(I)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentBinaryItemSet",
+      "MethodID": 305,
+      "MethodName": "getSupport",
+      "MethodSig": "()I"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentBinaryItemSet",
+      "MethodID": 306,
+      "MethodName": "getItems",
+      "MethodSig": "()Ljava/util/Collection;"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentBinaryItemSet",
+      "MethodID": 307,
+      "MethodName": "getItem",
+      "MethodSig": "(I)LFPGrowth$BinaryItem;"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentBinaryItemSet",
+      "MethodID": 308,
+      "MethodName": "numberOfItems",
+      "MethodSig": "()I"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentBinaryItemSet",
+      "MethodID": 309,
+      "MethodName": "toString",
+      "MethodSig": "()Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentBinaryItemSet",
+      "MethodID": 310,
+      "MethodName": "clone",
+      "MethodSig": "()Ljava/lang/Object;"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets$1",
+      "MethodID": 311,
+      "MethodName": "<init>",
+      "MethodSig": "(LFPGrowth$FrequentItemSets;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets$1",
+      "MethodID": 312,
+      "MethodName": "compare",
+      "MethodSig": "(LFPGrowth$FrequentBinaryItemSet;LFPGrowth$FrequentBinaryItemSet;)I"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets$1",
+      "MethodID": 313,
+      "MethodName": "compare",
+      "MethodSig": "(Ljava/lang/Object;Ljava/lang/Object;)I"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets",
+      "MethodID": 314,
+      "MethodName": "<init>",
+      "MethodSig": "(I)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets",
+      "MethodID": 315,
+      "MethodName": "getItemSet",
+      "MethodSig": "(I)LFPGrowth$FrequentBinaryItemSet;"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets",
+      "MethodID": 316,
+      "MethodName": "iterator",
+      "MethodSig": "()Ljava/util/Iterator;"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets",
+      "MethodID": 317,
+      "MethodName": "getNumberOfTransactions",
+      "MethodSig": "()I"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets",
+      "MethodID": 318,
+      "MethodName": "addItemSet",
+      "MethodSig": "(LFPGrowth$FrequentBinaryItemSet;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets",
+      "MethodID": 319,
+      "MethodName": "sort",
+      "MethodSig": "(Ljava/util/Comparator;)V"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets",
+      "MethodID": 320,
+      "MethodName": "size",
+      "MethodSig": "()I"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets",
+      "MethodID": 321,
+      "MethodName": "sort",
+      "MethodSig": "()V"
+    },
+    {
+      "ClassSig": "FPGrowth$FrequentItemSets",
+      "MethodID": 322,
+      "MethodName": "toString",
+      "MethodSig": "(I)Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth$ShadowCounts",
+      "MethodID": 323,
+      "MethodName": "<init>",
+      "MethodSig": "()V"
+    },
+    {
+      "ClassSig": "FPGrowth$ShadowCounts",
+      "MethodID": 324,
+      "MethodName": "getCount",
+      "MethodSig": "(I)I"
+    },
+    {
+      "ClassSig": "FPGrowth$ShadowCounts",
+      "MethodID": 325,
+      "MethodName": "increaseCount",
+      "MethodSig": "(II)V"
+    },
+    {
+      "ClassSig": "FPGrowth$ShadowCounts",
+      "MethodID": 326,
+      "MethodName": "removeCount",
+      "MethodSig": "(I)V"
+    },
+    {
+      "ClassSig": "FPGrowth",
+      "MethodID": 327,
+      "MethodName": "getCapabilities",
+      "MethodSig": "()Lcore/Capabilities;"
+    },
+    {
+      "ClassSig": "FPGrowth",
+      "MethodID": 328,
+      "MethodName": "globalInfo",
+      "MethodSig": "()Ljava/lang/String;"
+    },
+    {
+      "ClassSig": "FPGrowth",
+      "MethodID": 329,
+      "MethodName": "getTechnicalInformation",
+      "MethodSig": "()Lcore/TechnicalInformation;"
+    },
+    {
+      "ClassSig": "FPGrowth",
+      "MethodID": 330,
+      "MethodName": "passesMustContain",
+      "MethodSig": "(Lcore/Instance;[ZI)Z"
+    },
+    {
+      "ClassSig": "FPGrowth",
+      "MethodID": 331,
+      "MethodName": "getSingletons",
+      "MethodSig": "(Lcore/Instances;)Ljava/util/ArrayList;"
+    },
+    {
+      "ClassSig": "FPGrowth",
+      "MethodID": 332,
+      "MethodName": "buildFPTree",
+      "MethodSig": "(Ljava/util/ArrayList;Lcore/Instances;I)LFPGrowth$FPTreeRoot;"
+    },
+    {
+      "ClassSig": "FPGrowth",
+      "MethodID": 333,
+      "MethodName": "mineTree",
+      "MethodSig": "(LFPGrowth$FPTreeRoot;LFPGrowth$FrequentItemSets;ILFPGrowth$FrequentBinaryItemSet;I)V"
+    },
+    {
+      "ClassSig": "FPGrowth",
+      "MethodID": 334,
+      "MethodName": "<init>",
+      "MethodSig": "()V"
+    },
+    {
+      "ClassSig": "FPGrowth",
+      "MethodID": 335,
+      "MethodName": "resetOptions",
+      "MethodSig": "()V"
+    },
+    {
+      "ClassSig": "FPGrowth",
+      "MethodID": 336,
+      "MethodName": "positiveIndexTipText",
+      "MethodSig": "()Ljava/lang/String;"
+    }
+  ],
+  "Time": 0
+}

@@ -46,9 +46,7 @@ public class Connector : MonoBehaviour
   {
     // テスト用
     if (TestButton) {
-      if (Manager.CityObjectDB.DefaultPackage == null) {
-        connect_flag = true;
-      }
+      connect_flag = true;
       TestButton = false;
       AddTestJSON(TestFilePath);
     }

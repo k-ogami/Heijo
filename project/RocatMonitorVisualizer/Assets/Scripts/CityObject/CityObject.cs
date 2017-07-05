@@ -8,7 +8,8 @@ public class CityObject : MonoBehaviour
   // MethodIDとは別のIDを振り分ける
   public long ID = 0;
 
-  public float Width = 0;
+  public float WidthX = 0;
+  public float WidthZ = 0;
   public float Height = 0;
   public long Time = 0;
   public bool Visible = true;

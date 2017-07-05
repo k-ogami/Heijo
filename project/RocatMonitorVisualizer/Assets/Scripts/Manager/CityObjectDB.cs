@@ -21,7 +21,9 @@ public class CityObjectDB : MonoBehaviour
     foreach (Transform child in Manager.CityMaker.CitySpace.transform) {
       Destroy(child.gameObject);
     }
+    DefaultPackage = null;
     MethodDict.Clear();
+    ObjectDict.Clear();
   }
 
   // メソッドをDBに登録
