@@ -26,8 +26,12 @@ public class Monitor
     public long Time;
   }
 
-  private static class ExeTimeKey
+  private static class ExeTimeKey implements Comparable<ExeTimeKey>
   {
+
+    public long ThreadID;
+    public long MethodID;
+
     public ExeTimeKey(long threadID, long methodID)
     {
       ThreadID = threadID;
@@ -51,8 +55,12 @@ public class Monitor
       return (int)MethodID << 16 + ThreadID;
     }
 
-    public long ThreadID;
-    public long MethodID;
+    @Override
+    public int compareTo(ExeTimeKey o)
+    {
+      return Long.compare(MethodID, o.MethodID);
+    }
+
   }
 
   public static boolean IsAlive = true;
@@ -169,8 +177,7 @@ public class Monitor
 
   public static void RegistMethod(MethodInfo method)
   {
-    if (!IsAlive)
-      return;
+    if (!IsAlive) return;
 
     synchronized (lock) {
       newLoadMethodList.add(method);
@@ -180,12 +187,11 @@ public class Monitor
   private static void AddExeTime(long threadID, long methodID, long time)
   {
     ExeTimeKey key = new ExeTimeKey(threadID, methodID);
-    if (!exeTimeMap.containsKey(key)) {
+    Long value = exeTimeMap.get(key);
+    if (value == null) {
       exeTimeMap.put(key, time);
     } else {
-      Long value = exeTimeMap.get(key);
-      value += time;
-      exeTimeMap.put(key, value);
+      exeTimeMap.put(key, value + time);
     }
   }
 
