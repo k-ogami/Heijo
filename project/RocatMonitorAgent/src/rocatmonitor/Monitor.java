@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 
 import rocatmonitor.json.ExeTimeInfo;
 import rocatmonitor.json.MethodInfo;
@@ -49,7 +48,7 @@ public class Monitor
     @Override
     public int hashCode()
     {
-      return Objects.hash(ThreadID, MethodID);
+      return (int)MethodID << 16 + ThreadID;
     }
 
     public long ThreadID;
