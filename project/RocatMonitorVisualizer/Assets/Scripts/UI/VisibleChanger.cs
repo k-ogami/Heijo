@@ -100,7 +100,7 @@ public class VisibleChanger : MonoBehaviour
       str.Append("Package Name\t:" + CursoredObject.name);
     }
     else if (CursoredObject.IsClass) {
-      str.Append("Class Name\t:" + CursoredObject.name);
+      str.Append("Class Name\t\t:" + CursoredObject.name);
     }
     else {
       str.Append("Method Name\t:" + ((MethodObject)CursoredObject).GetPerfectName());
@@ -108,10 +108,10 @@ public class VisibleChanger : MonoBehaviour
     float rate = CursoredObject.Time / (Manager.ExeTimeDB.HeightHistory * Mathf.Pow(10, 9));
     if (1 < rate) rate = 1;
     if (0.01 < rate || rate == 0) {
-      str.Append("\nExecution Rate\t:" + rate.ToString("0.00%"));
+      str.Append("\nElevation\t\t\t:" + rate.ToString("0.00%"));
     }
     else {
-      str.Append("\nExecution Rate\t:" + (rate * 100).ToString("E2") + "%");
+      str.Append("\nElevation\t\t\t:" + (rate * 100).ToString("E2") + "%");
     }
     str.Append("\nThread Num\t\t:" + CursoredObject.ThreadNum);
     UI.Descriptor.SetText(str.ToString());

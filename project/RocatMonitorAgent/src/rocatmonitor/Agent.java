@@ -41,7 +41,6 @@ public class Agent
         Agent.Connector.Connect(Agent.ConfigReader.Host, Agent.ConfigReader.Port);
       } catch (IOException e) {
         Monitor.IsAlive = false;
-        // System.err.println("RocatMonitorAgent:接続に失敗しました。監視を中断します。");
         System.err.println("AgentError:Connection failed.");
         return;
       }

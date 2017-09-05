@@ -80,7 +80,6 @@ public class ByteTransformer implements ClassFileTransformer
     @Override
     public void visitCode()
     {
-      // バイトコード挿入
       super.visitCode();
       if (0 <= methodID) {
         mv.visitLdcInsn(methodID);
@@ -93,7 +92,6 @@ public class ByteTransformer implements ClassFileTransformer
     {
       if (0 <= methodID) {
         if ((Opcodes.IRETURN <= opcode && opcode <= Opcodes.RETURN) || opcode == Opcodes.ATHROW) {
-          // バイトコード挿入
           mv.visitLdcInsn(methodID);
           mv.visitMethodInsn(Opcodes.INVOKESTATIC, "rocatmonitor/Monitor", "MethodExit", "(J)V", false);
         }
