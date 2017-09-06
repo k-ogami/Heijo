@@ -119,8 +119,12 @@ public class Monitor
       List<TimeFrame> stack = timeStackMap.get(threadID);
 
       // 記録されている最後のメソッドと実際のメソッドが不一致である場合は無視
-      if (stack.size() == 0 || methodID != timeStackMap.get(threadID).get(timeStackMap.get(threadID).size() - 1).MethodID) {
-        return;
+      // FIXME 削除するよう一時変更。例外catch対応のため大幅な修正が必要
+      //if (stack.size() == 0 || methodID != timeStackMap.get(threadID).get(timeStackMap.get(threadID).size() - 1).MethodID) {
+      //  return;
+      //}
+      while (methodID != timeStackMap.get(threadID).get(timeStackMap.get(threadID).size() - 1).MethodID) {
+        timeStackMap.get(threadID).remove(timeStackMap.get(threadID).size() - 1);
       }
 
       // 終了したメソッドの実行時間を加算
