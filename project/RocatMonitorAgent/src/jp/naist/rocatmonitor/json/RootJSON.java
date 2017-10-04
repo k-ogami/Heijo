@@ -1,4 +1,4 @@
-package rocatmonitor.json;
+package jp.naist.rocatmonitor.json;
 
 import java.util.LinkedList;
 import java.util.List;

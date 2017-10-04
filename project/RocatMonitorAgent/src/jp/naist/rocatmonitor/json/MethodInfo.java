@@ -1,4 +1,4 @@
-package rocatmonitor.json;
+package jp.naist.rocatmonitor.json;
 
 public class MethodInfo
 {
