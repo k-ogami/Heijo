@@ -1,7 +1,15 @@
 ﻿[System.Serializable]
 public class RootJSON
 {
+
   public long Time;
-  public MethodInfo[] MethodInfos;
-  public ExeTimeInfo[] ExeTimeInfos;
+
+  public int Sample;
+
+  public CallCountInfo[] CallCountInfo;
+
+  public SampleCountInfo[] SampleCountInfo;
+
+  public MethodInfo[] MethodInfo;
+
 }

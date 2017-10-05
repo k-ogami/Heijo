@@ -5,14 +5,12 @@ public class MethodInfo
 
   public long MethodID;
   public String ClassSig;
-  public String MethodSig;
   public String MethodName;
 
-  public MethodInfo(long methodID, String classSig, String methodSig, String methodName)
+  public MethodInfo(long methodID, String classSig, String methodName)
   {
     MethodID = methodID;
     ClassSig = classSig;
-    MethodSig = methodSig;
     MethodName = methodName;
   }
 
