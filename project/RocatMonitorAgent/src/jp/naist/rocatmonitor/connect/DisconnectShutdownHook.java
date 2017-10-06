@@ -22,7 +22,6 @@ public class DisconnectShutdownHook extends Thread
         }
       }
     }
-
   }
 
 }

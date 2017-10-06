@@ -1,4 +1,5 @@
-﻿public class SampleCountInfo
+﻿[System.Serializable]
+public class SampleCountInfo
 {
 
   public long ThreadID = 0;

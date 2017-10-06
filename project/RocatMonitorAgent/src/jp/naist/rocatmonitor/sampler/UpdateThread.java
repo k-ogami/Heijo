@@ -34,9 +34,14 @@ public class UpdateThread extends Thread
   {
     RootJSON json = new RootJSON();
     json.Time = time;
-    json.Sample = Agent.Sampler.SamplingCounter;
-    json.CallCountInfo = (CallCountInfo[])Agent.Sampler.CallCountMap.values().toArray(new CallCountInfo[Agent.Sampler.CallCountMap.values().size()]);
-    json.SampleCountInfo = (SampleCountInfo[])Agent.Sampler.SampleCountMap.values().toArray(new SampleCountInfo[Agent.Sampler.SampleCountMap.values().size()]);
+    synchronized (Agent.Sampler.SampleLock) {
+      synchronized (Agent.Sampler.CallLock) {
+        json.Sample = Agent.Sampler.SamplingCounter;
+        json.CallCountInfo = (CallCountInfo[])Agent.Sampler.CallCountMap.values().toArray(new CallCountInfo[Agent.Sampler.CallCountMap.values().size()]);
+        json.SampleCountInfo = (SampleCountInfo[])Agent.Sampler.SampleCountMap.values().toArray(new SampleCountInfo[Agent.Sampler.SampleCountMap.values().size()]);
+      }
+    }
+
     Agent.Connector.SendAll(json);
     // 送信の度にクリア
     Agent.Sampler.CallCountMap.clear();

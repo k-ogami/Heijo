@@ -20,7 +20,6 @@ public class AcceptThread extends Thread
         Agent.Connector.Clients.add(new ConnectionInfo(socket));
         Agent.IsAlive = true;
       } catch (IOException e) {
-        return;
       }
     }
   }

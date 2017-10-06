@@ -20,6 +20,9 @@ public class Sampler
   // 呼び出し回数のカウンタ。キーはメソッドID
   public Map<Long, CallCountInfo> CallCountMap = Collections.synchronizedMap(new HashMap<Long, CallCountInfo>());
 
+  public Object SampleLock = new Object();
+  public Object CallLock = new Object();
+
   public void Start()
   {
     new SampleThread(SampleCountMap).start();

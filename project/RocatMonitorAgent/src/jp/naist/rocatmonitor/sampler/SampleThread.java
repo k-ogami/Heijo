@@ -40,28 +40,30 @@ public class SampleThread extends Thread
 
   private void Sample()
   {
-    Agent.Sampler.SamplingCounter++;
+    synchronized (Agent.Sampler.SampleLock) {
+      Agent.Sampler.SamplingCounter++;
 
-    for (Map.Entry<Thread, StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
-      // エージェントのスレッドは無視
-      if (Agent.AgentThreadIdSet.contains(entry.getKey().getId())) continue;
+      for (Map.Entry<Thread, StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
+        // エージェントのスレッドは無視
+        if (Agent.AgentThreadIdSet.contains(entry.getKey().getId())) continue;
 
-      // 監視対象のメソッドに辿り着くまで、スタックトレースの最後から順に探索
-      for (int i = entry.getValue().length - 1; 0 <= i; i--) {
-        StackTraceElement frame = entry.getValue()[i];
-        if (frame.isNativeMethod()) continue;
-        String name = frame.getClassName().replace('.', '/') + "/" + frame.getMethodName();
-        Long id = Agent.StructureDB.MethodIdMap.get(name);
-        if (id != null) {
-          // サンプル数を1増やす
-          ThreadMethodKey key = new ThreadMethodKey(entry.getKey().getId(), id);
-          SampleCountInfo info = sampleCountMap.get(key);
-          if (info == null) {
-            info = new SampleCountInfo(key.ThreadID, key.MethodID, 0);
-            sampleCountMap.put(key, info);
+        // 監視対象のメソッドに辿り着くまで、スタックトレースの最後から順に探索
+        for (int i = entry.getValue().length - 1; 0 <= i; i--) {
+          StackTraceElement frame = entry.getValue()[i];
+          if (frame.isNativeMethod()) continue;
+          String name = frame.getClassName().replace('.', '/') + "/" + frame.getMethodName();
+          Long id = Agent.StructureDB.MethodIdMap.get(name);
+          if (id != null) {
+            // サンプル数を1増やす
+            ThreadMethodKey key = new ThreadMethodKey(entry.getKey().getId(), id);
+            SampleCountInfo info = sampleCountMap.get(key);
+            if (info == null) {
+              info = new SampleCountInfo(key.ThreadID, key.MethodID, 0);
+              sampleCountMap.put(key, info);
+            }
+            info.Count++;
+            break;
           }
-          info.Count++;
-          break;
         }
       }
     }

@@ -10,12 +10,14 @@ public class Monitor
   {
     if (!Agent.IsAlive) return;
 
-    CallCountInfo info = Agent.Sampler.CallCountMap.get(methodID);
-    if (info == null) {
-      info = new CallCountInfo(methodID, 0);
-      Agent.Sampler.CallCountMap.put(methodID, info);
+    synchronized (Agent.Sampler.CallLock) {
+      CallCountInfo info = Agent.Sampler.CallCountMap.get(methodID);
+      if (info == null) {
+        info = new CallCountInfo(methodID, 0);
+        Agent.Sampler.CallCountMap.put(methodID, info);
+      }
+      info.Count++;
     }
-    info.Count++;
   }
 
 }

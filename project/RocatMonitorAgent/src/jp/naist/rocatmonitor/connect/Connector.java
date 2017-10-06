@@ -10,6 +10,7 @@ import java.util.List;
 
 import jp.naist.rocatmonitor.Agent;
 import jp.naist.rocatmonitor.ConstValue;
+import jp.naist.rocatmonitor.Exceptions.ServerOpenException;
 import jp.naist.rocatmonitor.json.RootJSON;
 import net.arnx.jsonic.JSON;
 import net.arnx.jsonic.JSONException;
@@ -17,6 +18,7 @@ import net.arnx.jsonic.JSONException;
 public class Connector
 {
 
+  // アプリケーション終了時、送信途中のデータの送信完了を待機するために使用
   public Object WriteLock = new Object();
 
   public List<ConnectionInfo> Clients = new LinkedList<ConnectionInfo>();
@@ -25,9 +27,13 @@ public class Connector
 
   private AcceptThread acceptThread = new AcceptThread();
 
-  public void Start() throws IOException
+  public void Start() throws ServerOpenException
   {
-    ServerSocket = new ServerSocket(Agent.Config.Port);
+    try {
+      ServerSocket = new ServerSocket(Agent.Config.Port);
+    } catch (IOException e) {
+      throw new ServerOpenException();
+    }
     acceptThread.start();
 
     // 終了時に、途中の送信を終えるまで待機、切断するためのhookを追加
@@ -73,6 +79,20 @@ public class Connector
     synchronized (WriteLock) {
       stream.write(header, 0, ConstValue.HEADER_SIZE);
       stream.write(data, 0, data.length);
+    }
+  }
+
+  public void Close()
+  {
+    try {
+      ServerSocket.close();
+    } catch (IOException e) {
+    }
+    for (ConnectionInfo client : Clients) {
+      try {
+        client.Socket.close();
+      } catch (IOException e) {
+      }
     }
   }
 

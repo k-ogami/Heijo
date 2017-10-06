@@ -4,6 +4,8 @@ import java.lang.instrument.Instrumentation;
 import java.util.HashSet;
 import java.util.Set;
 
+import jp.naist.rocatmonitor.Exceptions.ClassFileAccessException;
+import jp.naist.rocatmonitor.Exceptions.ServerOpenException;
 import jp.naist.rocatmonitor.collect.StructureDB;
 import jp.naist.rocatmonitor.connect.Connector;
 import jp.naist.rocatmonitor.sampler.Sampler;
@@ -31,6 +33,7 @@ public class Agent
     System.out.println("Setting agent...");
 
     try {
+
       // 設定ファイル読み込み
       Config.Load();
 
@@ -43,12 +46,16 @@ public class Agent
       // クラスロード時にバイトコード書き換えを行うTransformerを追加
       inst.addTransformer(new Transformer());
 
-      // サンプリング＆送信用のスレッドを開始
+      // サンプリング＆送信用の スレッドを開始
       Sampler.Start();
 
-      System.out.println("Success to set agent. (Port:" + Agent.Config.Port + ")");
-    } catch (Exception e) {
-      e.printStackTrace();
+      System.out.println("Succeeded to set agent. (Port:" + Agent.Config.Port + ")");
+
+    } catch (ServerOpenException e) {
+      System.out.println("Failed to open server. (Port:" + Agent.Config.Port + ")");
+    } catch (ClassFileAccessException e) {
+      System.out.println("Failed to access to class files");
+      Connector.Close();
     }
   }
 
