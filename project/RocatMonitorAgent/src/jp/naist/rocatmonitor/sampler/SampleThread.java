@@ -1,20 +1,16 @@
 package jp.naist.rocatmonitor.sampler;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import jp.naist.rocatmonitor.Agent;
-import jp.naist.rocatmonitor.json.SampleCountInfo;
-import jp.naist.rocatmonitor.monitor.ThreadMethodKey;
+import jp.naist.rocatmonitor.json.ExecuteInfo;
 
 public class SampleThread extends Thread
 {
 
-  private Map<ThreadMethodKey, SampleCountInfo> sampleCountMap = null;
-
-  public SampleThread(Map<ThreadMethodKey, SampleCountInfo> sampleCountMap)
-  {
-    this.sampleCountMap = sampleCountMap;
-  }
+  private Set<Long> calledMethodSet = new HashSet<Long>();
 
   @Override
   public void run()
@@ -52,20 +48,22 @@ public class SampleThread extends Thread
           StackTraceElement frame = entry.getValue()[i];
           if (frame.isNativeMethod()) continue;
           String name = frame.getClassName().replace('.', '/') + "/" + frame.getMethodName();
-          Long id = Agent.StructureDB.MethodIdMap.get(name);
-          if (id != null) {
-            // サンプル数を1増やす
-            ThreadMethodKey key = new ThreadMethodKey(entry.getKey().getId(), id);
-            SampleCountInfo info = sampleCountMap.get(key);
-            if (info == null) {
-              info = new SampleCountInfo(key.ThreadID, key.MethodID, 0);
-              sampleCountMap.put(key, info);
-            }
-            info.Count++;
+          Long methodID = Agent.StructureDB.MethodIdMap.get(name);
+          if (methodID != null) {
+            calledMethodSet.add(methodID);
             break;
           }
         }
       }
+      for (Long methodID : calledMethodSet) {
+        ExecuteInfo info = Agent.Sampler.ExeInfoMap.get(methodID);
+        if (info == null) {
+          info = new ExecuteInfo(methodID, 0, 0);
+          Agent.Sampler.ExeInfoMap.put(methodID, info);
+        }
+        info.Sample++;
+      }
+      calledMethodSet.clear();
     }
   }
 

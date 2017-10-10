@@ -6,60 +6,68 @@ using System.Collections.Generic;
 public class CityObjectDB : MonoBehaviour
 {
 
+  public string DefaultPackageName = null;
+
+  [System.NonSerialized]
+  public GameObject CitySpace = null;
+
   // デフォルトパッケージ(オブジェクト木構造の頂点)
   [System.NonSerialized]
-  public PackageObject DefaultPackage = null;
+  public CityObject DefaultPackage = null;
 
-  // メソッドとIDの対応付け辞書
-  public Dictionary<long, MethodObject> MethodDict = new Dictionary<long, MethodObject>();
-
-  // オブジェクトとメソッドとIDの対応付け辞書
+  // オブジェクトとオブジェクトIDの紐づけ辞書
   public Dictionary<long, CityObject> ObjectDict = new Dictionary<long, CityObject>();
 
-  public void Clear()
+  // メソッドオブジェクトとメソッドID（オブジェクトIDとは別）の紐づけ辞書
+  public Dictionary<long, CityObject> MethodDict = new Dictionary<long, CityObject>();
+
+  private long objectIdIterator = 0;
+
+  private void Awake()
   {
-    foreach (Transform child in Manager.CityMaker.CitySpace.transform) {
+    CitySpace = new GameObject("CitySpace");
+  }
+
+  public void Init()
+  {
+    foreach (Transform child in CitySpace.transform) {
       Destroy(child.gameObject);
     }
-    DefaultPackage = null;
     MethodDict.Clear();
     ObjectDict.Clear();
+    DefaultPackage = CityObject.Create(CityObjectType.Package, objectIdIterator++, DefaultPackageName);
+    ObjectDict.Add(DefaultPackage.ID, DefaultPackage);
+    DefaultPackage.transform.parent = CitySpace.transform;
   }
 
   // メソッドをDBに登録
-  public void RegistUnknownMethod(MethodInfo info)
+  public void RegistMethod(MethodInfo info)
   {
-    // 返値
-    string ret = MethodSig2RetType(info.MethodSig);
-    // 引数
-    string[] args = MethodSig2ArgTypes(info.MethodSig);
-    // 実装クラス名(パッケージ名含む)
-    string declare = ConvertTypeName("L" + info.ClassSig + ";");
-
-    // メソッドより上位のオブジェクトらが登録されていなければを登録。メソッドの1つ上のクラスオブジェクトを取得
-    ClassObject klass = RegistObjectsOverMethod(declare);
+    // メソッドより上位のオブジェクトらが登録されていなければを登録。メソッドの1つ上のオブジェクト（クラス）を取得
+    CityObject klass = RegistObjectsOverMethod(info.ClassSig);
 
     // メソッドオブジェクト生成
-    MethodObject method = MethodObject.Create(info.MethodName, info.MethodID, ret, args);
-    method.transform.parent = Manager.CityMaker.CitySpace.transform;
+    CityObject method = CityObject.Create(CityObjectType.Method , objectIdIterator++, info.MethodName);
+    ObjectDict.Add(method.ID, method);
+    method.transform.parent = CitySpace.transform;
 
     // 親子関係の紐づけ
     klass.AddChild(method);
 
-    // IDと紐づけ
+    // メソッドオブジェクトとメソッドIDを紐づけ
     MethodDict.Add(info.MethodID, method);
   }
 
-  private ClassObject RegistObjectsOverMethod(string type)
+  private CityObject RegistObjectsOverMethod(string classSig)
   {
     // 例："packageA/packageB/MyClass$InnerClass"
 
-    PackageObject lastPackage; // 最下位のパッケージ
-    ClassObject lastClass; // 最下位のクラス
+    CityObject lastPackage; // 最下位のパッケージ
+    CityObject lastClass; // 最下位のクラス
 
     Regex reg = new Regex("(.*)/(.*)");
     string package_text, class_text;
-    Match match = reg.Match(type);
+    Match match = reg.Match(classSig);
     if (match.Success) {
       package_text = match.Groups[1].Value;
       class_text = match.Groups[2].Value;
@@ -70,7 +78,7 @@ public class CityObjectDB : MonoBehaviour
     }
     // スラッシュがない場合、デフォルトパッケージにあるクラス
     else {
-      class_text = type;
+      class_text = classSig;
       lastPackage = DefaultPackage;
     }
 
@@ -82,17 +90,18 @@ public class CityObjectDB : MonoBehaviour
     return lastClass;
   }
 
-  private PackageObject CheckAndRegistUnknownPackages(string[] names)
+  private CityObject CheckAndRegistUnknownPackages(string[] names)
   {
     // 最下位のパッケージオブジェクト
-    PackageObject lastPackage = DefaultPackage;
+    CityObject lastPackage = DefaultPackage;
 
     foreach (string name in names) {
       // 未知のパッケージの場合、生成して登録
       if (!lastPackage.PackageChildren.ContainsKey(name)) {
         // 生成
-        PackageObject newPackage = PackageObject.Create(name);
-        newPackage.transform.parent = Manager.CityMaker.CitySpace.transform;
+        CityObject newPackage = CityObject.Create(CityObjectType.Package, objectIdIterator++, name);
+        ObjectDict.Add(newPackage.ID, newPackage);
+        newPackage.transform.parent = CitySpace.transform;
         // 親子関係の紐づけ
         lastPackage.AddChild(newPackage);
       }
@@ -103,7 +112,7 @@ public class CityObjectDB : MonoBehaviour
     return lastPackage;
   }
 
-  private ClassObject CheckAndRegistUnknownClasses(string[] names, PackageObject lastPackage)
+  private CityObject CheckAndRegistUnknownClasses(string[] names, CityObject lastPackage)
   {
     // 最下位のオブジェクト
     CityObject lastObject = lastPackage;
@@ -112,8 +121,9 @@ public class CityObjectDB : MonoBehaviour
       // 未知のクラスの場合、生成して登録
       if (!lastObject.ClassChildren.ContainsKey(name)) {
         // 生成
-        ClassObject newClass = ClassObject.Create(name);
-        newClass.transform.parent = Manager.CityMaker.CitySpace.transform;
+        CityObject newClass = CityObject.Create(CityObjectType.Class, objectIdIterator++, name);
+        ObjectDict.Add(newClass.ID, newClass);
+        newClass.transform.parent = CitySpace.transform;
         // 親子関係の紐づけ
         lastObject.AddChild(newClass);
       }
@@ -121,8 +131,7 @@ public class CityObjectDB : MonoBehaviour
       lastObject = lastObject.ClassChildren[name];
     }
 
-    // 正しく処理されていれば必ずキャストできるはず……
-    return (ClassObject)lastObject;
+    return lastObject;
   }
 
   private string[] PackageText2PackageNames(string text)
@@ -144,124 +153,5 @@ public class CityObjectDB : MonoBehaviour
     return outputs;
   }
 
-  private string MethodSig2RetType(string sig)
-  {
-    // void main(String[])の場合"([Ljava/lang/String;)V"
-    // ↑返値部分"V"を取得
-    Regex reg = new Regex("\\(.*\\)(.*)");
-    string ret = reg.Match(sig).Groups[1].Value;
-
-    // 型名を変換
-    return ConvertTypeName(ret);
-  }
-
-  private string[] MethodSig2ArgTypes(string sig)
-  {
-    // void main(String[])の場合"([Ljava/lang/String;)V"
-    // ↑引数部分"[Ljava/lang/String;"を取得(複数)
-    Regex reg = new Regex("\\((.*)\\).*");
-    string args = reg.Match(sig).Groups[1].Value;
-    LinkedList<string> types = new LinkedList<string>();
-
-    bool isArray = false;
-    for (int i = 0; i < args.Length; i++) {
-      // [から始まる場合、次に現れる型は引数型
-      if (args[i] == '[') {
-        isArray = true;
-      }
-      else {
-        string type;
-        // Lから始まる場合、Lから;までが型名
-        if (args[i] == 'L') {
-          int start = i++;
-          for (; args[i] != ';'; i++) ;
-          int end = i;
-          type = args.Substring(start, end - start + 1);
-        }
-        // それ以外の場合、型名は1文字（プリミティブ型）
-        else {
-          type = args[i].ToString();
-        }
-        // 配列フラグ処理
-        if (isArray) {
-          type = "[" + type;
-          isArray = false;
-        }
-        // 型名を整形
-        type = ConvertTypeName(type);
-        // 追加
-        types.AddLast(type);
-      }
-    }
-
-    // LinkedList -> 配列
-    string[] array = new string[types.Count];
-    int itrator = 0;
-    foreach (string type in types) {
-      array[itrator] = type;
-      itrator++;
-    }
-
-    return array;
-  }
-
-  private string ConvertTypeName(string type)
-  {
-    string output = type;
-
-    // [から始まる場合は配列型。1文字ずらす
-    int arrayCount = 0;
-    while (output[0] == '[') {
-      arrayCount++;
-      output = output.Substring(1, output.Length - 1);
-    }
-
-    // Lから始まる場合、Lと;の間が型名
-    if (output[0] == 'L') {
-      output = output.Substring(1, output.Length - 2);
-    }
-    // それ以外の場合、プリミティブ型
-    else {
-      switch (output[0]) {
-        case 'V':
-          output = "void";
-          break;
-        case 'Z':
-          output = "boolean";
-          break;
-        case 'B':
-          output = "byte";
-          break;
-        case 'C':
-          output = "char";
-          break;
-        case 'S':
-          output = "short";
-          break;
-        case 'I':
-          output = "int";
-          break;
-        case 'J':
-          output = "long";
-          break;
-        case 'F':
-          output = "float";
-          break;
-        case 'D':
-          output = "double";
-          break;
-        default:
-          MonoBehaviour.print("エラー：\"" + output + "\"は不明なプリミティブ型名です。");
-          break;
-      }
-    }
-
-    // 配列処理
-    for (int i = 0; i < arrayCount; i++) {
-      output += "[]";
-    }
-
-    return output;
-  }
-
 }
+

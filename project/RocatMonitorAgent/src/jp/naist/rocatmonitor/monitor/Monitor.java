@@ -1,7 +1,7 @@
 package jp.naist.rocatmonitor.monitor;
 
 import jp.naist.rocatmonitor.Agent;
-import jp.naist.rocatmonitor.json.CallCountInfo;
+import jp.naist.rocatmonitor.json.ExecuteInfo;
 
 public class Monitor
 {
@@ -11,12 +11,12 @@ public class Monitor
     if (!Agent.IsAlive) return;
 
     synchronized (Agent.Sampler.CallLock) {
-      CallCountInfo info = Agent.Sampler.CallCountMap.get(methodID);
+      ExecuteInfo info = Agent.Sampler.ExeInfoMap.get(methodID);
       if (info == null) {
-        info = new CallCountInfo(methodID, 0);
-        Agent.Sampler.CallCountMap.put(methodID, info);
+        info = new ExecuteInfo(methodID, 0, 0);
+        Agent.Sampler.ExeInfoMap.put(methodID, info);
       }
-      info.Count++;
+      info.Call++;
     }
   }
 

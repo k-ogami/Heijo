@@ -18,7 +18,7 @@ public class ExeTimeDB : MonoBehaviour
     public ExeTimeInfo[] ExeTimeInfos;
   }
 
-  public void Clear()
+  public void Init()
   {
     timeDataList.Clear();
   }

@@ -5,12 +5,10 @@ public class RootJSON
 
   public long Time = 0;
 
-  public int Sample = 0;
+  public long Sample = 0;
 
-  public CallCountInfo[] CallCountInfo = new CallCountInfo[] {};
+  public MethodInfo[] MethodInfo = null;
 
-  public SampleCountInfo[] SampleCountInfo = new SampleCountInfo[] {};
-
-  public MethodInfo[] MethodInfo = new MethodInfo[] {};
+  public ExecuteInfo[] ExecuteInfo = null;
 
 }

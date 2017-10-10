@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System;
 
 public class CityMaker : MonoBehaviour
 {
 
-  public string DefaultPackageName = null;
   public GameObject HeigherObject = null;
 
   [Header("Placement")]
@@ -19,59 +17,20 @@ public class CityMaker : MonoBehaviour
   public Color ClassColor = Color.black;
   public Color MethodColor = Color.black;
 
-  // CityObject置き場
+  // 街の構築完了済みフラグ
   [System.NonSerialized]
-  public GameObject CitySpace = null;
+  public bool IsMade = false;
 
-  public void Initialize()
+  public void Make()
   {
-    CitySpace = new GameObject("CitySpace");
+    IsMade = false;
+
+
   }
-
-  public void Work(List<RootJSON> jsons)
-  {
-    // 初生成のとき
-    if (Manager.Connector.GetConnectFlag()) {
-      // 全消去
-      Manager.CityObjectDB.Clear();
-      Manager.ExeTimeDB.Clear();
-
-      // 初期化
-      CityObject.ID_iterator = 0;
-      Manager.CityObjectDB.DefaultPackage = PackageObject.Create(DefaultPackageName);
-      Manager.CityObjectDB.DefaultPackage.transform.parent = CitySpace.transform;
-      Manager.CityObjectDB.DefaultPackage.Visible = true;
-      Manager.CityObjectDB.DefaultPackage.GetComponent<Renderer>().material.color = PackageColor;
-    }
-
-    bool remake = false;
-
-    // 未知のメソッドが知らされたとき、DBに登録して、街を再構築
-    foreach (RootJSON json in jsons)
-      if (json.MethodInfos.Length != 0) {
-        foreach (MethodInfo methodInfo in json.MethodInfos) {
-          Manager.CityObjectDB.RegistUnknownMethod(methodInfo);
-          remake = true;
-        }
-      }
-    if (remake) {
-      Remake();
-    }
-
-    // メソッドの実行時間の情報を処理
-    foreach (RootJSON json in jsons) {
-      if (json != null && json.ExeTimeInfos != null) {
-        Manager.ExeTimeDB.RegistInfo(json.ExeTimeInfos, json.Time);
-      }
-    }
-    Manager.ExeTimeDB.SetHeight();
-  }
-
+  
   // 配置
   private void Remake()
   {
-    // Visibleの設定
-    RecSetVisible(Manager.CityObjectDB.DefaultPackage);
     // 座標のリセット（transformの親子関係を使用せずに親子の移動をさせたことの弊害）
     ResetPos();
     // x,z座標とサイズの設定

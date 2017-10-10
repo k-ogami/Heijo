@@ -1,9 +1,9 @@
 package jp.naist.rocatmonitor.sampler;
 
 import jp.naist.rocatmonitor.Agent;
-import jp.naist.rocatmonitor.json.CallCountInfo;
+import jp.naist.rocatmonitor.detect.Detector;
+import jp.naist.rocatmonitor.json.ExecuteInfo;
 import jp.naist.rocatmonitor.json.RootJSON;
-import jp.naist.rocatmonitor.json.SampleCountInfo;
 
 public class UpdateThread extends Thread
 {
@@ -30,6 +30,8 @@ public class UpdateThread extends Thread
     }
   }
 
+  private Detector detector = new Detector();
+
   private void Update(long time)
   {
     RootJSON json = new RootJSON();
@@ -37,15 +39,16 @@ public class UpdateThread extends Thread
     synchronized (Agent.Sampler.SampleLock) {
       synchronized (Agent.Sampler.CallLock) {
         json.Sample = Agent.Sampler.SamplingCounter;
-        json.CallCountInfo = (CallCountInfo[])Agent.Sampler.CallCountMap.values().toArray(new CallCountInfo[Agent.Sampler.CallCountMap.values().size()]);
-        json.SampleCountInfo = (SampleCountInfo[])Agent.Sampler.SampleCountMap.values().toArray(new SampleCountInfo[Agent.Sampler.SampleCountMap.values().size()]);
+        json.ExecuteInfo = Agent.Sampler.ExeInfoMap.values().toArray(new ExecuteInfo[] {});
       }
     }
 
-    Agent.Connector.SendAll(json);
+    //Agent.Connector.SendAll(json);
+    detector.putData(json);
+
+
     // 送信の度にクリア
-    Agent.Sampler.CallCountMap.clear();
-    Agent.Sampler.SampleCountMap.clear();
+    Agent.Sampler.ExeInfoMap.clear();
     Agent.Sampler.SamplingCounter = 0;
   }
 

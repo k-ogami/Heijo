@@ -64,6 +64,31 @@ public class Connector : MonoBehaviour
     }
   }
 
+  // 受信したデータを持っているか否か
+  public bool HasReceivedData()
+  {
+    return receivedDataList.Count != 0;
+  }
+
+  // 初接続フラグを取得。取得後はfalseになる
+  public bool GetConnectFlag()
+  {
+    bool flag = connect_flag;
+    connect_flag = false;
+    return flag;
+  }
+
+  // 初接続後、メソッド情報を抜き出す
+  public MethodInfo[] PopMethodInfo()
+  {
+    lock (receivedDataList) {
+      if (receivedDataList.Count == 0) {
+        return null;
+      }
+      return receivedDataList.First.Value.MethodInfo;
+    }
+  }
+
   // 受信したデータを抜き出す
   public List<RootJSON> PopReceivedDataList()
   {
@@ -77,19 +102,6 @@ public class Connector : MonoBehaviour
         return list;
       }
     }
-  }
-
-  // 受信したデータを持っているか否か
-  public bool HasReceivedData()
-  {
-    return receivedDataList.Count != 0;
-  }
-
-  public bool GetConnectFlag()
-  {
-    bool flag = connect_flag;
-    connect_flag = false;
-    return flag;
   }
 
   // 別スレッドで処理される処理

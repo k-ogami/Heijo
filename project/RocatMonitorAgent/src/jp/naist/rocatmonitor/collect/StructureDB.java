@@ -74,6 +74,11 @@ public class StructureDB
     }
   }
 
+  public long GetMaxMethodNum()
+  {
+    return MethodIdMap.size();
+  }
+
   private void FindClassAndJar(File path, Set<String> classFileSet, Set<String> jarFileSet) throws IOException
   {
     if (path.isDirectory()) {
