@@ -1,87 +1,70 @@
 package jp.naist.rocatmonitor;
 
+import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
 
-import jp.naist.rocatmonitor.Exceptions.ClassFileAccessException;
-import jp.naist.rocatmonitor.Exceptions.ServerOpenException;
-import jp.naist.rocatmonitor.collect.StructureDB;
-import jp.naist.rocatmonitor.connect.Connector;
-import jp.naist.rocatmonitor.sampler.Sampler;
-import jp.naist.rocatmonitor.transform.Transformer;
+import jp.naist.rocatmonitor.debug.DebugValue;
+import jp.naist.rocatmonitor.message.Message;
 
 public class Agent
 {
-
-  public static Config Config = new Config();
-
-  public static Connector Connector = new Connector();
-
-  public static StructureDB StructureDB = new StructureDB();
-
-  public static Sampler Sampler = new Sampler();
-
-  // 接続数が0のときfalseになり、処理を省略する
-  public static boolean IsAlive = false;
-
-  // 通信やサンプラで使用するスレッドのIDのセット
-  public static Set<Long> AgentThreadIdSet = new HashSet<Long>();
 
   public static void premain(String args, Instrumentation inst)
   {
     System.out.println("Setting agent...");
 
-    try {
+    boolean success = true;
+    MonitoringService service = null;
 
+    do {
       // 設定ファイル読み込み
-      Config.Load();
-
-      // 通信用スレッド開始
-      Connector.Start();
-
-      // クラスパス以下のクラスファイルを走査して、パッケージ・クラス・メソッド名を収集
-      StructureDB.Collect();
-
-      // クラスロード時にバイトコード書き換えを行うTransformerを追加
-      inst.addTransformer(new Transformer());
-
-      // サンプリング＆送信用の スレッドを開始
-      Sampler.Start();
-
-      System.out.println("Succeeded to set agent. (Port:" + Agent.Config.Port + ")");
-
-    } catch (ServerOpenException e) {
-      System.out.println("Failed to open server. (Port:" + Agent.Config.Port + ")");
-    } catch (ClassFileAccessException e) {
-      System.out.println("Failed to access to class files");
-      Connector.Close();
-    }
-  }
-
-  public static boolean IsIgnoreClass(String classSig)
-  {
-    String[] tokens = classSig.split("/");
-
-    if (tokens.length == 1) {
-      return Agent.Config.IgnorePackages.contains(ConstValue.DEFAULT_PACKAGE_NAME);
-    }
-
-    // パッケージが除外対象であるか調べる
-    // たとえば、classSigがjava/lang/Stringの場合、java.*, java.lang.*,
-    // java.langのいずれかが除外対象に含まれていれば除外
-    StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < tokens.length - 1; i++) {
-      builder.append(tokens[i]);
-      if (Agent.Config.IgnorePackages.contains(builder.toString() + ".*")) {
-        return true;
+      Config config = new Config();
+      try {
+        config.load();
+      } catch (Exception e) {
+        System.err.println("Failed to load " + ConstValue.CONFIG_FILE_PATH);
       }
-      if (i == tokens.length - 2 && Agent.Config.IgnorePackages.contains(builder.toString())) {
-        return true;
+
+      // サーバに接続
+      Connector connector = new Connector();
+      if (!(DebugValue.DEBUG_FLAG && DebugValue.DEBUG_NO_CONNECT)) {
+        try {
+          connector.connect(config.Host, config.Port);
+        } catch (Exception e) {
+          System.err.println("Failed to connect " + config.Host + ":" + config.Port);
+          success = false;
+          break;
+        }
       }
-      builder.append(".");
+
+      // クラスパス以下のクラスファイルを走査して、パッケージ・クラス・メソッド名を収集・送信
+      StructureDB structureDB = new StructureDB(config.IgnorePackages);
+      try {
+        structureDB.collectFromClassPath();
+        if (!(DebugValue.DEBUG_FLAG && DebugValue.DEBUG_NO_CONNECT)) {
+          Message message = new Message();
+          message.MethodDatas = new LinkedList<>(structureDB.IdDataMap.values());
+          connector.write(message);
+        }
+      } catch (IOException e) {
+        System.out.println("Failed to access to class files");
+        if (!(DebugValue.DEBUG_FLAG && DebugValue.DEBUG_NO_CONNECT)) {
+          connector.close();
+        }
+        success = false;
+        break;
+      }
+
+      service = new MonitoringService(config, connector, structureDB);
+    } while (false);
+
+    if (success) {
+      System.out.println("Succeeded to set agent");
+      if (service != null) {
+        service.start();
+      }
     }
-    return false;
   }
 
 }

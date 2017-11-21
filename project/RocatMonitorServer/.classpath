@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="res"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/msgpack-0.6.12.jar" sourcepath="C:/Users/ogami/AppData/Local/Temp/decompiler/source/msgpack-0.6.12-sources.jar"/>
+	<classpathentry kind="lib" path="lib/jubatus-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/msgpack-rpc-0.7.1.jar"/>
+	<classpathentry kind="lib" path="lib/netty-3.2.5.Final.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-1.7.25.jar"/>
+	<classpathentry kind="lib" path="lib/javassist-3.22.0-GA.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
