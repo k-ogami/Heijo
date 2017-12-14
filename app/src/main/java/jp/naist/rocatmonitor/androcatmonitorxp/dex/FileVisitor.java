@@ -27,7 +27,7 @@ public class FileVisitor extends DexFileVisitor
 
   private String getPackageNameFromClassSig(String classSig)
   {
-    // "Lcom/example/Hoge;" -> "com.example";
+    // "Lcom/example/Hoge;" -> "com.example"
 
     String fullname = classSig.substring(1, classSig.length() - 2);
     String[] tokens = fullname.split("/");
@@ -50,7 +50,7 @@ public class FileVisitor extends DexFileVisitor
 
   private String getClassNameFromClassSig(String classSig)
   {
-    // "Lcom/example/Hoge;" -> "com.example.Hoge";
+    // "Lcom/example/Hoge;" -> "com.example.Hoge"
 
     String fullname = classSig.substring(1, classSig.length() - 2);
     String[] tokens = fullname.split("/");
