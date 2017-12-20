@@ -1,23 +1,23 @@
 package jp.naist.rocatmonitor.androcatmonitorxp.message;
 
-//@org.msgpack.annotation.Message
-public class MethodData
+@org.msgpack.annotation.Message
+public class MethodInfo
 {
 
-  //@org.msgpack.annotation.Index(0)
+  @org.msgpack.annotation.Index(0)
   public int MethodID;
 
-  //@org.msgpack.annotation.Index(1)
+  @org.msgpack.annotation.Index(1)
   public String ClassName;
 
-  //@org.msgpack.annotation.Index(2)
+  @org.msgpack.annotation.Index(2)
   public String MethodName;
 
-  public MethodData()
+  public MethodInfo()
   {
   }
 
-  public MethodData(int methodID, String className, String methodName)
+  public MethodInfo(int methodID, String className, String methodName)
   {
     MethodID = methodID;
     ClassName = className;

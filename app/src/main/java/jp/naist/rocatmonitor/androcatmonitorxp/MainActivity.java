@@ -1,10 +1,14 @@
 package jp.naist.rocatmonitor.androcatmonitorxp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -26,6 +30,8 @@ public class MainActivity extends Activity
   private Button startButton = null;
   private TextView logTextView = null;
 
+  private SharedPreferences dataSaver = null;
+
   @Override
   protected void onCreate(Bundle bundle)
   {
@@ -40,7 +46,12 @@ public class MainActivity extends Activity
     startButton = (Button)findViewById(R.id.startButton);
     logTextView = (TextView)findViewById(R.id.logTextView);
 
+    // 名前は適当
+    dataSaver = getSharedPreferences(ConstValue.THIS_PACKAGE_NAME, Context.MODE_PRIVATE);
+
+    setSavedInput();
     setInstalledApps();
+    setSavingTextEventListener();
     setButtonEventListener();
   }
 
@@ -49,6 +60,22 @@ public class MainActivity extends Activity
   {
     super.onResume();
     setNewInstalledApps();
+  }
+
+  private void setSavedInput()
+  {
+    String host = dataSaver.getString(ConstValue.BUNDLE_HOST, null);
+    if (host != null && host.length()!= 0) {
+      hostEditText.setText(host);
+    }
+    String port = dataSaver.getString(ConstValue.BUNDLE_PORT, null);
+    if (port != null && port.length()!= 0) {
+      portEditText.setText(port);
+    }
+    String ignore = dataSaver.getString(ConstValue.BUNDLE_IGNORE_PACKAGE_NAMES, null);
+    if (ignore != null && ignore.length()!= 0) {
+      ignoreEditText.setText(ignore);
+    }
   }
 
   private void setInstalledApps()
@@ -89,6 +116,47 @@ public class MainActivity extends Activity
     appSpinner.setSelection(position);
   }
 
+  private void setSavingTextEventListener()
+  {
+    // キーはBundle用の文字列を使いまわす
+    hostEditText.addTextChangedListener(new TextWatcher()
+    {
+      @Override
+      public void afterTextChanged(Editable s)
+      {
+        dataSaver.edit().putString(ConstValue.BUNDLE_HOST, hostEditText.getText().toString()).apply();
+      }
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) { }
+    });
+    portEditText.addTextChangedListener(new TextWatcher()
+    {
+      @Override
+      public void afterTextChanged(Editable s)
+      {
+        dataSaver.edit().putString(ConstValue.BUNDLE_PORT, portEditText.getText().toString()).apply();
+      }
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) { }
+    });
+    ignoreEditText.addTextChangedListener(new TextWatcher()
+    {
+      @Override
+      public void afterTextChanged(Editable s)
+      {
+        dataSaver.edit().putString(ConstValue.BUNDLE_IGNORE_PACKAGE_NAMES, ignoreEditText.getText().toString()).apply();
+      }
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) { }
+    });
+  }
+
   private void setButtonEventListener()
   {
     startButton.setOnClickListener(new View.OnClickListener()
@@ -108,7 +176,6 @@ public class MainActivity extends Activity
          }
         // 転送するデータをここに追加する
         {
-          selectedApp.putExtra(ConstValue.BUNDLE_FLAG, true);
           selectedApp.putExtra(ConstValue.BUNDLE_TARGET_PACKAGE_NAME, packageName);
           selectedApp.putExtra(ConstValue.BUNDLE_HOST, hostEditText.getText().toString());
           selectedApp.putExtra(ConstValue.BUNDLE_PORT, Integer.valueOf(portEditText.getText().toString()));

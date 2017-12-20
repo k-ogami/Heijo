@@ -29,7 +29,7 @@ public class FileVisitor extends DexFileVisitor
   {
     // "Lcom/example/Hoge;" -> "com.example"
 
-    String fullname = classSig.substring(1, classSig.length() - 2);
+    String fullname = classSig.substring(1, classSig.length() - 1);
     String[] tokens = fullname.split("/");
 
     if (tokens.length == 0) {
@@ -52,7 +52,7 @@ public class FileVisitor extends DexFileVisitor
   {
     // "Lcom/example/Hoge;" -> "com.example.Hoge"
 
-    String fullname = classSig.substring(1, classSig.length() - 2);
+    String fullname = classSig.substring(1, classSig.length() - 1);
     String[] tokens = fullname.split("/");
 
     if (tokens.length == 0) {

@@ -28,12 +28,14 @@ public class Monitor
     return instance;
   }
 
-  public StructureDB StructureDB = new StructureDB();
-  public Connector Connector = new Connector();
-
   public Activity Activity = null;
   public Intent Intent = null;
   public ApplicationInfo AppInfo = null;
+
+  public  Config Config = new Config();
+  public StructureDB StructureDB = new StructureDB();
+  public Connector Connector = new Connector();
+  public SamplingThread Sampler = new SamplingThread();
 
   public boolean init(Activity activity, Intent intent, ApplicationInfo appInfo)
   {
@@ -41,10 +43,11 @@ public class Monitor
     this.Intent = intent;
     this.AppInfo = appInfo;
     try {
+      readConfig();
       setIgnorePackage();
       collectAllClasses();
-      // connect();
-      // startThread();
+      connect();
+      startThread();
     } catch (Exception e) {
       XposedBridge.log(e);
       return false;
@@ -52,18 +55,28 @@ public class Monitor
     return true;
   }
 
-  private void setIgnorePackage()
+  private void readConfig()
   {
-    // このパッケージ自身も監視対象外にセットする
-    StructureDB.IgnorePackageNameSet.add(ConstValue.THIS_PACKAGE_NAME + ".*");
-    // 入力されたパッケージを監視対象外にセットする
+    Config.Host = Intent.getStringExtra(ConstValue.BUNDLE_HOST);
+    Config.Port = Intent.getIntExtra(ConstValue.BUNDLE_PORT, 0);
+
+    // IgnorePackage
     String input = Intent.getStringExtra(ConstValue.BUNDLE_IGNORE_PACKAGE_NAMES);
     String[] tokens = input.split(",|\n");
     for (String token : tokens) {
       String pack = token.replaceAll(" |\t", "");
       if (pack.length() == 0) continue;
-      StructureDB.IgnorePackageNameSet.add(pack);
+      Config.IgnorePackages.add(pack);
     }
+
+    // TODO 変更可能にする？ [ms]
+    Config.SampleInterval = 2;
+    Config.UpdateInterval = 100;
+  }
+
+  private void setIgnorePackage()
+  {
+    StructureDB.IgnorePackageNameSet.addAll(Config.IgnorePackages);
   }
 
   private void collectAllClasses() throws IOException
@@ -93,6 +106,16 @@ public class Monitor
       reader.accept(fv);
     }
     apk.close();
+  }
+
+  private void connect() throws Exception
+  {
+    Connector.connect(Config.Host, Config.Port);
+  }
+
+  private void startThread()
+  {
+    Sampler.start();
   }
 
 }

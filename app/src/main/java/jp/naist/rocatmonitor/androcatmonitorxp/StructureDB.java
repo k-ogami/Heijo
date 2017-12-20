@@ -5,13 +5,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jp.naist.rocatmonitor.androcatmonitorxp.message.MethodData;
+import jp.naist.rocatmonitor.androcatmonitorxp.message.MethodInfo;
 
 public class StructureDB
 {
 
   // メソッドIDとメソッド情報のMap。現状Listでも良いがデバッグの際に便利なので
-  public Map<Integer, MethodData> IdDataMap = new HashMap<>();
+  public Map<Integer, MethodInfo> IdDataMap = new HashMap<>();
 
   // メソッドの完全名（パッケージ名+クラス名+メソッド名）とメソッドIDのMap。サンプリングの際、StackTraceElemet->メソッドIDの変換のために用いる
   public Map<String, Integer> NameIdMap = new HashMap<>();
@@ -24,27 +24,19 @@ public class StructureDB
 
   private int methodIdIterator = 0;
 
-  private String nowClassName = null;
-
-  private Set<String> methodNameSet = new HashSet<>();
-
   public void registMethod(String className, String methodName)
   {
-    if (nowClassName == null || !nowClassName.equals(className)) {
-      nowClassName = className;
-      methodNameSet.clear();
-    }
-
-    // getStackTraceではメソッドの引数の型情報は取れないので、オーバーロードされたメソッドは同一と見なす
-    if (methodNameSet.contains(methodName)) return;
-    methodNameSet.add(methodName);
+    // オーバーロードされたメソッドは区別しない（スタックトレースからは引数の型が取得できないので）
+    if (NameIdMap.containsKey(className + "." + methodName)) return;
 
     // メソッド情報を登録
-    MethodData methodData = new MethodData(methodIdIterator++, className, methodName);
-    IdDataMap.put(methodData.MethodID, methodData);
-    NameIdMap.put(methodData.toString(), methodData.MethodID);
+    MethodInfo method = new MethodInfo(methodIdIterator++, className, methodName);
+    IdDataMap.put(method.MethodID, method);
+    NameIdMap.put(method.toString(), method.MethodID);
 
-    // XposedBridge.log("registed { ID:" + methodData.MethodID + ", Name:" + methodData.toString() + " }");
+    ClassNameSet.add(className);
+
+    // XposedBridge.log("registed { ID:" + method.MethodID + ", Name:" + method.toString() + " }");
   }
 
   public boolean isIgnorePackage(String packageName)
