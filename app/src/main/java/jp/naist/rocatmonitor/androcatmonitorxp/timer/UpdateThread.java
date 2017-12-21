@@ -17,6 +17,8 @@ public class UpdateThread extends Thread
 
   private boolean isFirstSend = true;
 
+  private long before = -1;
+
   private IntervalPrinter debugIntervalPrinter = null;
 
   public UpdateThread()
@@ -53,7 +55,16 @@ public class UpdateThread extends Thread
 
     synchronized (Monitor.getInstance().Scheduler.Lock) {
       message.CurrentTime = System.currentTimeMillis();
-      message.TimeLength = Monitor.getInstance().Config.UpdateInterval;
+
+      // 前回のupdateとのIntervalを計算。初回時は固定時間を信じる
+      if (before < 0) {
+        message.TimeLength = Monitor.getInstance().Config.UpdateInterval;
+      }
+      else {
+        long diff = message.CurrentTime - before;
+        message.TimeLength = diff;
+      }
+      before = message.CurrentTime;
 
       for (Map.Entry<Pair<Integer, Long>, Integer> entry : Monitor.getInstance().Scheduler.SampleNumMap.entrySet()) {
         int methodID = entry.getKey().first;
@@ -84,7 +95,7 @@ public class UpdateThread extends Thread
     if (DebugValue.DEBUG_FLAG && DebugValue.DEBUG_NO_CONNECT) return;
 
     Message message = new Message();
-    message.CurrentTime = System.currentTimeMillis();
+    message.CurrentTime = 0;
     message.TimeLength = 0;
     message.Methods.addAll(Monitor.getInstance().StructureDB.IdDataMap.values());
     try {
