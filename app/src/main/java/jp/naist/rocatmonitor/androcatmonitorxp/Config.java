@@ -8,8 +8,8 @@ public class Config
 
   public String Host;
   public int Port;
-  public int SampleInterval;
-  public int UpdateInterval;
+  public double SampleInterval;
+  public double UpdateInterval;
 
   public Set<String> IgnorePackages = new HashSet<String>() { { add(ConstValue.THIS_PACKAGE_NAME); } };
 

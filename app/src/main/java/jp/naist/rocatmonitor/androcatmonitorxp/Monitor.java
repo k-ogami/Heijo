@@ -16,12 +16,14 @@ import java.util.zip.ZipFile;
 import de.robv.android.xposed.XposedBridge;
 import jp.naist.rocatmonitor.androcatmonitorxp.dex.ClassVisitor;
 import jp.naist.rocatmonitor.androcatmonitorxp.dex.FileVisitor;
+import jp.naist.rocatmonitor.androcatmonitorxp.timer.Scheduler;
 
 public class Monitor
 {
 
   private static Monitor instance = null;
 
+  // FIXME too long
   public static Monitor getInstance()
   {
     if (instance == null) instance = new Monitor();
@@ -32,10 +34,10 @@ public class Monitor
   public Intent Intent = null;
   public ApplicationInfo AppInfo = null;
 
-  public  Config Config = new Config();
+  public Config Config = new Config();
   public StructureDB StructureDB = new StructureDB();
   public Connector Connector = new Connector();
-  public SamplingThread Sampler = new SamplingThread();
+  public Scheduler Scheduler = new Scheduler();
 
   public boolean init(Activity activity, Intent intent, ApplicationInfo appInfo)
   {
@@ -115,7 +117,7 @@ public class Monitor
 
   private void startThread()
   {
-    Sampler.start();
+    Scheduler.start();
   }
 
 }

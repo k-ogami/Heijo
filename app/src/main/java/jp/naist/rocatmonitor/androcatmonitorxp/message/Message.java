@@ -11,7 +11,7 @@ public class Message
   public long CurrentTime = 0;
 
   @org.msgpack.annotation.Index(1)
-  public long TimeLength = 0;
+  public double TimeLength = 0;
 
   @org.msgpack.annotation.Index(2)
   public List<MethodInfo> Methods = new LinkedList<>();

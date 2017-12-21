@@ -5,19 +5,19 @@ public class ExeTimeInfo
 {
 
   @org.msgpack.annotation.Index(0)
-  public long MethodID = 0;
+  public int MethodID = 0;
 
   @org.msgpack.annotation.Index(1)
   public long ThreadID = 0;
 
   @org.msgpack.annotation.Index(2)
-  public long ExeTime = 0;
+  public double ExeTime = 0;
 
   public ExeTimeInfo()
   {
   }
 
-  public ExeTimeInfo(long methodID, long threadID, long exeTime)
+  public ExeTimeInfo(int methodID, long threadID, double exeTime)
   {
     MethodID = methodID;
     ThreadID = threadID;
