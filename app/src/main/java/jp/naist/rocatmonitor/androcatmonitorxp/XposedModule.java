@@ -20,6 +20,9 @@ public class XposedModule implements IXposedHookLoadPackage
   {
     if (!loadPackageParam.isFirstApplication || !loadPackageParam.packageName.equals(loadPackageParam.processName)) return;
 
+    // FIXME GoogleStoreでインストール時にBadParcelableException: ClassNotFoundException when unmarchalling
+    if (loadPackageParam.packageName.equals("com.android.vending")) return;
+
     // アプリケーションの起動にフックする
     XposedHelpers.findAndHookMethod(
             "android.app.Instrumentation", loadPackageParam.classLoader,

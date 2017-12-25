@@ -58,9 +58,6 @@ public class FileVisitor extends DexFileVisitor
     if (tokens.length == 0) {
       return null;
     }
-    if (tokens.length == 1) {
-      return ConstValue.DEFAULT_PACKAGE_NAME;
-    }
     else {
       StringBuilder builder = new StringBuilder();
       for (int i = 0; i < tokens.length; i++) {
