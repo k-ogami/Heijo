@@ -2,7 +2,6 @@ package jp.naist.rocatmonitor;
 
 import java.io.IOException;
 
-import jp.naist.rocatmonitor.debug.DebugValue;
 import us.jubat.anomaly.AnomalyClient;
 
 public class Main
@@ -22,8 +21,10 @@ public class Main
         System.err.println("Failed to load " + ConstValue.CONFIG_FILE_PATH);
       }
 
+
       // jubatusに接続
       AnomalyClient anomaly = null;
+      /* 封印
       if (!(DebugValue.DEBUG_FLAG && DebugValue.DEBUG_NO_JUBATUS)) {
         try {
           anomaly = new AnomalyClient(config.JubatusHost, config.JubatusPort, "jp.naist.rocatmonitor", 3600);
@@ -34,6 +35,7 @@ public class Main
           success = false;
         }
       }
+      */
 
       // Agentの接続を待つ
       ClientConnector agentClient = null;

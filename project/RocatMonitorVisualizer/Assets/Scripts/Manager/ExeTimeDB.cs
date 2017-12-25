@@ -5,49 +5,40 @@ using System;
 public class ExeTimeDB : MonoBehaviour
 {
 
-  public float MaxTime = 0;
-  public float HeightHistory = 0;
+  public double MaxTime = 60;
+  public double HeightHistory = 0;
   public float MinHeight = 0.01f;
 
-  private LinkedList<TimeData> timeDataList = new LinkedList<TimeData>();
-  private float history = 0;
-
-  public class TimeData
-  {
-    public long Time_ns;
-    public ExeTimeInfo[] ExeTimeInfos;
-  }
+  private LinkedList<Message> messages = new LinkedList<Message>();
+  private double history = 0;
 
   public void Init()
   {
-    timeDataList.Clear();
+    messages.Clear();
   }
 
-  public void RegistInfo(ExeTimeInfo[] infos, long time)
+  public void RegistInfo(Message message)
   {
     // データを追加
-    TimeData timeData = new TimeData();
-    timeData.Time_ns = time;
-    timeData.ExeTimeInfos = infos;
-    timeDataList.AddLast(timeData);
+    messages.AddLast(message);
     // 最長保有時間を超えると古いデータから削除
-    while (timeDataList.Count != 0 && MaxTime * Mathf.Pow(10, 9) < timeDataList.Last.Value.Time_ns - timeDataList.First.Value.Time_ns) {
-      timeDataList.RemoveFirst();
+    while (messages.Count != 0 && MaxTime * Mathf.Pow(10, 3) < messages.Last.Value.CurrentTime - messages.First.Value.CurrentTime) {
+      messages.RemoveFirst();
     }
   }
 
   public void SetHeight()
   {
     // <メソッドID, <スレッドID, 実行時間>>
-    Dictionary<long, Dictionary<long, long>> methodDic = new Dictionary<long, Dictionary<long, long>>();
+    Dictionary<int, Dictionary<long, double>> methodDic = new Dictionary<int, Dictionary<long, double>>();
 
     // 時間範囲内のメソッド毎スレッド毎の実行時間を取得
-    long last = timeDataList.Last.Value.Time_ns;
-    long length = (long)(HeightHistory * Mathf.Pow(10, 9));
-    for (LinkedListNode<TimeData> i = timeDataList.Last; i != null && last - i.Value.Time_ns < length; i = i.Previous) {
-      foreach (ExeTimeInfo info in i.Value.ExeTimeInfos) {
+    long last = messages.Last.Value.CurrentTime;
+    long length = (long)(HeightHistory * Mathf.Pow(10, 3));
+    for (LinkedListNode<Message> i = messages.Last; i != null && last - i.Value.CurrentTime < length; i = i.Previous) {
+      foreach (ExeTimeInfo info in i.Value.ExeTimes) {
         if (!methodDic.ContainsKey(info.MethodID)) {
-          methodDic[info.MethodID] = new Dictionary<long, long>();
+          methodDic[info.MethodID] = new Dictionary<long, double>();
           methodDic[info.MethodID][info.ThreadID] = info.ExeTime;
         }
         else {
@@ -60,22 +51,22 @@ public class ExeTimeDB : MonoBehaviour
         }
       }
       // 保有時間の更新
-      history = last - i.Value.Time_ns;
+      history = last - i.Value.CurrentTime;
     }
 
     // 高さをリセット
     RecResetHeight();
 
     // <オブジェクトID, <スレッドID, 実行時間>>
-    Dictionary<long, Dictionary<long, long>> objDic = new Dictionary<long, Dictionary<long, long>>();
+    Dictionary<int, Dictionary<long, double>> objDic = new Dictionary<int, Dictionary<long, double>>();
 
     // 実行されたメソッドを走査し、自身および親オブジェクトにオブジェクト毎スレッド毎の実行時間を加算していく
-    foreach (KeyValuePair<long, Dictionary<long, long>> pair in methodDic) {
+    foreach (KeyValuePair<int, Dictionary<long, double>> pair in methodDic) {
       RecAddExeTimeToParents(objDic, pair.Value, Manager.CityObjectDB.MethodDict[pair.Key]);
     }
 
     // オブジェクトの高さを設定
-    foreach (KeyValuePair<long, Dictionary<long, long>> pair in objDic) {
+    foreach (KeyValuePair<int, Dictionary<long, double>> pair in objDic) {
       CityObject obj = Manager.CityObjectDB.ObjectDict[pair.Key];
       // 各スレッドで最も長い実行時間から高さを算出
       long time = 0;
@@ -89,19 +80,19 @@ public class ExeTimeDB : MonoBehaviour
       obj.ThreadNum = pair.Value.Count;
       // 高さを設定
       float height;
-      height = history != 0 ? obj.Time / history : 0;
+      height = history != 0 ? (float)(obj.Time / history) : 0;
       if (1 < height) height = 1;
-      Manager.CityObjectDB.ObjectDict[pair.Key].SetHeight(height);
+      Manager.CityObjectDB.ObjectDict[pair.Key].SetHeight(height, UI.HeightSlider.Slider.value);
     }
   }
 
-  private void RecAddExeTimeToParents(Dictionary<long, Dictionary<long, long>> objDic, Dictionary<long, long> data, CityObject obj)
+  private void RecAddExeTimeToParents(Dictionary<int, Dictionary<long, double>> objDic, Dictionary<long, double> data, CityObject obj)
   {
     if (!objDic.ContainsKey(obj.ID)) {
-      objDic[obj.ID] = new Dictionary<long, long>(data);
+      objDic[obj.ID] = new Dictionary<long, double>(data);
     }
     else {
-      foreach (KeyValuePair<long, long> pair in data) {
+      foreach (KeyValuePair<long, double> pair in data) {
         if (!objDic[obj.ID].ContainsKey(pair.Key)) {
           objDic[obj.ID][pair.Key] = pair.Value;
         }
@@ -121,7 +112,7 @@ public class ExeTimeDB : MonoBehaviour
     foreach (CityObject obj in Manager.CityObjectDB.ObjectDict.Values) {
       obj.ThreadNum = 0; // スレッド数もここでリセット
       obj.Time = 0;
-      obj.SetHeight(0);
+      obj.SetHeight(0, UI.HeightSlider.Slider.value);
     }
   }
 

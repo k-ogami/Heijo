@@ -57,7 +57,9 @@ public class StructureDB
 
     // classファイルのバイトコードを調べる
     for (String classFile : classFiles) {
-      collectClass(new FileInputStream(classFile));
+      FileInputStream fis = new FileInputStream(classFile);
+      collectClass(fis);
+      fis.close();
     }
 
     // jarファイル内にあるclassファイルのバイトコードを調べる

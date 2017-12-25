@@ -6,17 +6,19 @@ public class VisibleChanger : MonoBehaviour
 
   public Color CursoredColor = Color.black;
   public float DescriptTime = 0;
+  public float CatchDoubleClickTime = 0;
 
   [System.NonSerialized]
   public CityObject CursoredObject = null;
 
   private Color originalColor = Color.black;
-  private float time = 0;
+  private float cursoringTime = 0;
+  private float preDoubleClickTime = 0;
 
   private void Update()
   {
     CheckCursor();
-    // ChangeByClick(); // 封印
+    ChangeByDoubleClick();
   }
 
   private void CheckCursor()
@@ -39,7 +41,7 @@ public class VisibleChanger : MonoBehaviour
 
     // 選択中のオブジェクトが変化した場合
     if (CursoredObject != cursored) {
-      time = 0;
+      cursoringTime = 0;
       UI.Descriptor.SetVisible(false);
       // 選択から外れたオブジェクトの色を戻す
       if (CursoredObject != null) {
@@ -57,38 +59,13 @@ public class VisibleChanger : MonoBehaviour
       if (CursoredObject != null) {
         SetText();
         // 一定時間カーソルを合わせていたら、説明用のパネルを表示
-        if (DescriptTime < time) {
+        if (DescriptTime < cursoringTime) {
           UI.Descriptor.SetVisible(true);
           UI.Descriptor.SetTransform(Input.mousePosition);
         }
         else {
-          time += Time.deltaTime;
+          cursoringTime += Time.deltaTime;
         }
-      }
-    }
-  }
-
-  private void ChangeByClick()
-  {
-    bool click = Input.GetMouseButtonDown(0);
-    if (click && CursoredObject != null && !CursoredObject.IsMethod) {
-      if (CursoredObject.ChildrenVisivle) {
-        CursoredObject.ChildrenVisivle = false;
-        RecSetChildrenVisible(CursoredObject, false);
-      }
-      else {
-        CursoredObject.ChildrenVisivle = true;
-        RecSetChildrenVisible(CursoredObject, true);
-      }
-    }
-  }
-
-  private void RecSetChildrenVisible(CityObject obj, bool visible)
-  {
-    foreach (CityObject child in obj.GetChildren()) {
-      child.SetVisible(visible);
-      if (child.ChildrenVisivle) {
-        RecSetChildrenVisible(child, visible);
       }
     }
   }
@@ -96,25 +73,61 @@ public class VisibleChanger : MonoBehaviour
   private void SetText()
   {
     StringBuilder str = new StringBuilder();
-    if (CursoredObject.IsPackage) {
-      str.Append("Package Name\t:" + CursoredObject.name);
+    if (CursoredObject.Type == CityObject.TypeEnum.Package) {
+      str.Append("Package Name\t:" + CursoredObject.Name);
     }
-    else if (CursoredObject.IsClass) {
-      str.Append("Class Name\t\t:" + CursoredObject.name);
-    }
-    else {
-      str.Append("Method Name\t:" + ((MethodObject)CursoredObject).GetPerfectName());
-    }
-    float rate = CursoredObject.Time / (Manager.ExeTimeDB.HeightHistory * Mathf.Pow(10, 9));
-    if (1 < rate) rate = 1;
-    if (0.01 < rate || rate == 0) {
-      str.Append("\nElevation\t\t\t:" + rate.ToString("0.00%"));
+    else if (CursoredObject.Type == CityObject.TypeEnum.Class) {
+      str.Append("Class Name\t\t:" + CursoredObject.Name);
     }
     else {
-      str.Append("\nElevation\t\t\t:" + (rate * 100).ToString("E2") + "%");
+      str.Append("Method Name\t:" + CursoredObject.Name);
+    }
+    if (0.01 < CursoredObject.Height_0_1 || CursoredObject.Height_0_1 == 0) {
+      str.Append("\nElevation\t\t\t:" + CursoredObject.Height_0_1.ToString("0.00%"));
+    }
+    else {
+      str.Append("\nElevation\t\t\t:" + (CursoredObject.Height_0_1 * 100).ToString("E2") + "%");
     }
     str.Append("\nThread Num\t\t:" + CursoredObject.ThreadNum);
     UI.Descriptor.SetText(str.ToString());
+  }
+
+  private void ChangeByDoubleClick()
+  {
+    bool click = Input.GetMouseButtonDown(0);
+    bool doubleClick = false;
+    if (click) {
+      float now = Time.time;
+      float interval = now - preDoubleClickTime;
+      if (interval < CatchDoubleClickTime) {
+        doubleClick = true;
+        preDoubleClickTime = 0;
+      }
+      else {
+        preDoubleClickTime = now;
+      }
+    }
+
+    if (doubleClick && CursoredObject != null && CursoredObject.Type != CityObject.TypeEnum.Method) {
+      if (CursoredObject.ChildrenVisible) {
+        CursoredObject.ChildrenVisible = false;
+        RecSetChildrenVisible(CursoredObject, false);
+      }
+      else {
+        CursoredObject.ChildrenVisible = true;
+        RecSetChildrenVisible(CursoredObject, true);
+      }
+    }
+  }
+
+  private void RecSetChildrenVisible(CityObject obj, bool visible)
+  {
+    foreach (CityObject child in obj.Children) {
+      child.SetVisible(visible);
+      if (child.ChildrenVisible) {
+        RecSetChildrenVisible(child, visible);
+      }
+    }
   }
 
 }

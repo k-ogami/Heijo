@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.IO;
+using MsgPack.Serialization;
+using System.Net;
 
 public class Connector : MonoBehaviour
 {
@@ -14,42 +14,24 @@ public class Connector : MonoBehaviour
 
   public int Port = 0;
 
-  [Header("Test")]
-  public bool IsConnected = false;
-  public bool TestButton = false;
-  public string TestFilePath = null;
-  public bool PrintLog = false;
-
-  [Header("SaveJSON")]
-  public bool SaveJSON = false;
-  public string SavePath = null;
-  public string SaveFileName = null;
+  [Header("Debug")]
+  public bool DebugPrintLog = false;
 
   private TcpClient socket = new TcpClient();
   private Thread thread = null;
 
   // 受信したデータを蓄積
-  private LinkedList<RootJSON> receivedDataList = new LinkedList<RootJSON>();
-
-  private int save_file_num = 0;
+  private LinkedList<Message> receivedDataList = new LinkedList<Message>();
 
   private bool connect_flag = false;
+
+  MessagePackSerializer<Message> serializer = SerializationContext.Default.GetSerializer<Message>();
 
   private void Awake()
   {
     // 接続・受信用スレッドを生成
     thread = new Thread(ThreadLoop);
     thread.Start();
-  }
-
-  private void Update()
-  {
-    // テスト用
-    if (TestButton) {
-      connect_flag = true;
-      TestButton = false;
-      AddTestJSON(TestFilePath);
-    }
   }
 
   private void OnApplicationQuit()
@@ -79,25 +61,25 @@ public class Connector : MonoBehaviour
   }
 
   // 初接続後、メソッド情報を抜き出す
-  public MethodInfo[] PopMethodInfo()
+  public List<MethodInfo> PopMethodInfo()
   {
     lock (receivedDataList) {
       if (receivedDataList.Count == 0) {
         return null;
       }
-      return receivedDataList.First.Value.MethodInfo;
+      return receivedDataList.First.Value.Methods;
     }
   }
 
   // 受信したデータを抜き出す
-  public List<RootJSON> PopReceivedDataList()
+  public List<Message> PopReceivedDataList()
   {
     lock (receivedDataList) {
       if (receivedDataList.Count == 0) {
         return null;
       }
       else {
-        List<RootJSON> list = new List<RootJSON>(receivedDataList);
+        List<Message> list = new List<Message>(receivedDataList);
         receivedDataList.Clear();
         return list;
       }
@@ -113,31 +95,9 @@ public class Connector : MonoBehaviour
     }
   }
 
-  // テスト用
-  private void AddTestJSON(string path)
-  {
-    try {
-      StreamReader stream = new StreamReader(TestFilePath, Encoding.GetEncoding("UTF-8"));
-      string input = stream.ReadToEnd();
-      stream.Close();
-      RootJSON json = JsonUtility.FromJson<RootJSON>(input);
-      lock (receivedDataList) {
-        receivedDataList.AddLast(json);
-      }
-    }
-    catch (FileNotFoundException) {
-      print("エラー：テストファイル\"" + TestFilePath + "\"が見つかりません。");
-    }
-    catch (ArgumentException) {
-      print("エラー：テストファイル\"" + TestFilePath + "\"のデシリアライズに失敗しました。");
-    }
-  }
-
   // 接続待ち
   private void Accept()
   {
-    IsConnected = false;
-
     // 切断処理
     if (socket.Connected) {
       socket.Close();
@@ -148,7 +108,6 @@ public class Connector : MonoBehaviour
     listener.Start();
     socket = listener.AcceptTcpClient();
     listener.Stop();
-    IsConnected = true;
     connect_flag = true;
   }
 
@@ -163,7 +122,7 @@ public class Connector : MonoBehaviour
       Thread.Sleep(1);
       int payload_size = 0;
       {
-        if (PrintLog) {
+        if (DebugPrintLog) {
           print("------------------------------");
           print("Connector:ヘッダ受信開始");
         }
@@ -174,59 +133,36 @@ public class Connector : MonoBehaviour
           h_count -= read;
           if (read == 0) return;
         }
+        Array.Reverse(header);
         payload_size = BitConverter.ToInt32(header, 0);
-        if (PrintLog) {
+        if (DebugPrintLog) {
           print("Connector:ヘッダ受信完了");
         }
       }
       // ペイロード読み込み
-      if (PrintLog) {
+      if (DebugPrintLog) {
         print("Connector:ペイロード（" + payload_size + "バイト）受信開始");
       }
-      string text = null;
+      byte[] payload = new byte[payload_size];
       {
         int p_count = payload_size;
-        byte[] payload = new byte[payload_size];
         while (p_count != 0) {
           Thread.Sleep(1);
           int read = stream.Read(payload, payload_size - p_count, p_count);
           p_count -= read;
           if (read == 0) return;
         }
-        text = Encoding.UTF8.GetString(payload);
-        // JSONテキストをファイルとして保存する（デバッグ用）
-        if (SaveJSON) {
-          Save(text);
-        }
       }
-      if (PrintLog) {
+      if (DebugPrintLog) {
         print("Connector:ペイロード受信完了");
       }
-      // 受信したJSONテキストをデシリアライズしてリストに格納
       {
-        RootJSON json = JsonUtility.FromJson<RootJSON>(text);
+        Message message = serializer.Unpack(new MemoryStream(payload));
         lock (receivedDataList) {
-          receivedDataList.AddLast(json);
+          receivedDataList.AddLast(message);
         }
       }
     }
-  }
-
-  private void Save(string text)
-  {
-    string filename;
-    if (SavePath[SavePath.Length - 1] != '/' && SavePath[SavePath.Length - 1] != '\\') {
-      SavePath += "/";
-    }
-    for (; ; save_file_num++) {
-      filename = SavePath + SaveFileName + "_" + save_file_num + ".txt";
-      if (!File.Exists(filename)) {
-        break;
-      }
-    }
-    StreamWriter writer = new StreamWriter(filename, false, Encoding.GetEncoding("UTF-8"));
-    writer.Write(text);
-    writer.Close();
   }
 
 }

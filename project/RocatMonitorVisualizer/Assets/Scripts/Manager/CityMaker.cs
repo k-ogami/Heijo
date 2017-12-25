@@ -4,7 +4,9 @@ using System.Collections.Generic;
 public class CityMaker : MonoBehaviour
 {
 
-  public GameObject HeigherObject = null;
+  [Header("Clone")]
+  public GameObject CityObjectClone = null;
+  public GameObject HeigherObjectClone = null;
 
   [Header("Placement")]
   public float MethodWidth = 0;
@@ -17,19 +19,8 @@ public class CityMaker : MonoBehaviour
   public Color ClassColor = Color.black;
   public Color MethodColor = Color.black;
 
-  // 街の構築完了済みフラグ
-  [System.NonSerialized]
-  public bool IsMade = false;
-
-  public void Make()
-  {
-    IsMade = false;
-
-
-  }
-  
   // 配置
-  private void Remake()
+  public void Remake()
   {
     // 座標のリセット（transformの親子関係を使用せずに親子の移動をさせたことの弊害）
     ResetPos();
@@ -39,17 +30,6 @@ public class CityMaker : MonoBehaviour
     RecSetThreashold(Manager.CityObjectDB.DefaultPackage);
     // 色の設定
     RecSetColor(Manager.CityObjectDB.DefaultPackage);
-  }
-
-  private void RecSetVisible(CityObject obj, bool visible = true)
-  {
-    if (obj.ChildrenVisivle == false) {
-      visible = false;
-    }
-    foreach (CityObject child in obj.GetChildren()) {
-      child.Visible = visible;
-      RecSetVisible(child, visible);
-    }
   }
 
   private void ResetPos()
@@ -71,7 +51,7 @@ public class CityMaker : MonoBehaviour
     obj.transform.position = new Vector3(pos.x, height + Threashold / 2, pos.z);
     obj.transform.localScale = new Vector3(scale.x, Threashold, scale.z);
     float next = height + Threashold;
-    foreach (CityObject child in obj.GetChildren()) {
+    foreach (CityObject child in obj.Children) {
       RecSetThreashold(child, next);
     }
   }
@@ -80,13 +60,13 @@ public class CityMaker : MonoBehaviour
   {
     // 色を設定
     Color color = Color.black;
-    if (obj.IsPackage) {
+    if (obj.Type == CityObject.TypeEnum.Package) {
       color = PackageColor;
     }
-    else if (obj.IsClass) {
+    else if (obj.Type == CityObject.TypeEnum.Class) {
       color = ClassColor;
     }
-    else if (obj.IsMethod) {
+    else if (obj.Type == CityObject.TypeEnum.Method) {
       color = MethodColor;
     }
     for (int i = 0; i < depth; i++) {
@@ -105,7 +85,7 @@ public class CityMaker : MonoBehaviour
     }
     obj.GetComponent<Renderer>().material.color = color;
     // 子へ再帰
-    if (obj.IsPackage) {
+    if (obj.Type == CityObject.TypeEnum.Package) {
       foreach (CityObject child in obj.PackageChildren.Values) {
         RecSetColor(child, depth + 1);
       }
@@ -113,7 +93,7 @@ public class CityMaker : MonoBehaviour
         RecSetColor(child);
       }
     }
-    else if (obj.IsClass) {
+    else if (obj.Type == CityObject.TypeEnum.Class) {
       foreach (CityObject child in obj.ClassChildren.Values) {
         RecSetColor(child, depth + 1);
       }

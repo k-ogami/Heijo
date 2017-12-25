@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System;
 
 public class BinPackingMaker
 {
@@ -40,18 +39,18 @@ public class BinPackingMaker
     node.Object = obj;
     node.IsUsed = true;
 
-    if (obj.IsMethod) {
+    if (obj.Type == CityObject.TypeEnum.Method) {
       node.Width = node.Height = Manager.CityMaker.MethodWidth + Manager.CityMaker.EdgeWidth * 2;
-      obj.WidthX = obj.WidthZ = Manager.CityMaker.MethodWidth + Manager.CityMaker.EdgeWidth * 2;
+      obj.WidthX = obj.WidthY = Manager.CityMaker.MethodWidth + Manager.CityMaker.EdgeWidth * 2;
     }
     else {
       List<Node> children = new List<Node>();
-      foreach (CityObject child in obj.GetChildren()) {
+      foreach (CityObject child in obj.Children) {
         children.Add(RecPlace(child));
       }
       Node inside = MakeInside(children);
       node.Width = obj.WidthX = inside.Width + Manager.CityMaker.EdgeWidth * 2;
-      node.Height = obj.WidthZ = inside.Height + Manager.CityMaker.EdgeWidth * 2;
+      node.Height = obj.WidthY = inside.Height + Manager.CityMaker.EdgeWidth * 2;
     }
 
     return node;
@@ -206,16 +205,16 @@ public class BinPackingMaker
     foreach (var pair in fitDict) {
       CityObject obj = Manager.CityObjectDB.ObjectDict[pair.Key];
       Node node = pair.Value;
-      obj.transform.position += new Vector3(node.X + obj.WidthX / 2, 0, node.Y + obj.WidthZ / 2);
+      obj.transform.position += new Vector3(node.X + obj.WidthX / 2, 0, node.Y + obj.WidthY / 2);
       AddPosToChildren(obj, new Vector3(Manager.CityMaker.EdgeWidth + node.X, 0, Manager.CityMaker.EdgeWidth + node.Y));
-      obj.transform.localScale = new Vector3(obj.WidthX - Manager.CityMaker.EdgeWidth * 2, 1, obj.WidthZ - Manager.CityMaker.EdgeWidth * 2);
+      obj.transform.localScale = new Vector3(obj.WidthX - Manager.CityMaker.EdgeWidth * 2, 1, obj.WidthY - Manager.CityMaker.EdgeWidth * 2);
     }
   }
 
   private void AddPosToChildren(CityObject obj, Vector3 pos, bool parent = true)
   {
     if (!parent) obj.transform.position += pos;
-    foreach (CityObject child in obj.GetChildren()) {
+    foreach (CityObject child in obj.Children) {
       AddPosToChildren(child, pos, false);
     }
   }

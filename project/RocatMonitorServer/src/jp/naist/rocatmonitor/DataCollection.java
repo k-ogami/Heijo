@@ -35,7 +35,6 @@ public class DataCollection
             debugIdNameMap.put(method.MethodID, method);
           }
         }
-
         continue;
       }
       History.add(message);

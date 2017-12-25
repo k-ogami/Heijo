@@ -23,7 +23,7 @@ public class Manager : MonoBehaviour
       Work();
     }
   }
-  
+
   private void Work()
   {
     // 初生成のとき
@@ -32,22 +32,18 @@ public class Manager : MonoBehaviour
       CityObjectDB.Init();
       ExeTimeDB.Init();
       // メソッドを登録
-      foreach (MethodInfo info in Connector.PopMethodInfo()) {
-        CityObjectDB.RegistMethod(info);
+      foreach (MethodInfo method in Connector.PopMethodInfo()) {
+        CityObjectDB.RegistMethod(method);
       }
-      // 非同期に街の構築を開始
-      CityMaker.AsyncMake()
+      CityMaker.Remake();
     }
 
-    // 街の構築が完了しているとき
-    if (CityMaker.IsMade) {
-      // メソッドの実行情報を登録
-      foreach (RootJSON json in Connector.PopReceivedDataList()) {
-          ExeTimeDB.RegistInfo(json);
-      }
-      // オブジェクトの高さを更新
-      ExeTimeDB.SetHeight();
+    // メソッドの実行情報を登録
+    foreach (Message message in Connector.PopReceivedDataList()) {
+      ExeTimeDB.RegistInfo(message);
     }
+    // オブジェクトの高さを更新
+    ExeTimeDB.SetHeight();
 
   }
 

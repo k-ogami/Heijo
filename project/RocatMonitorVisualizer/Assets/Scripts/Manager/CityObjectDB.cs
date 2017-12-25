@@ -21,7 +21,7 @@ public class CityObjectDB : MonoBehaviour
   // メソッドオブジェクトとメソッドID（オブジェクトIDとは別）の紐づけ辞書
   public Dictionary<long, CityObject> MethodDict = new Dictionary<long, CityObject>();
 
-  private long objectIdIterator = 0;
+  private int objectIdIterator = 0;
 
   private void Awake()
   {
@@ -35,7 +35,8 @@ public class CityObjectDB : MonoBehaviour
     }
     MethodDict.Clear();
     ObjectDict.Clear();
-    DefaultPackage = CityObject.Create(CityObjectType.Package, objectIdIterator++, DefaultPackageName);
+    objectIdIterator = 0;
+    DefaultPackage = CityObject.Create(CityObject.TypeEnum.Package, objectIdIterator++, DefaultPackageName);
     ObjectDict.Add(DefaultPackage.ID, DefaultPackage);
     DefaultPackage.transform.parent = CitySpace.transform;
   }
@@ -44,10 +45,10 @@ public class CityObjectDB : MonoBehaviour
   public void RegistMethod(MethodInfo info)
   {
     // メソッドより上位のオブジェクトらが登録されていなければを登録。メソッドの1つ上のオブジェクト（クラス）を取得
-    CityObject klass = RegistObjectsOverMethod(info.ClassSig);
+    CityObject klass = RegistObjectsOverMethod(info.ClassName);
 
     // メソッドオブジェクト生成
-    CityObject method = CityObject.Create(CityObjectType.Method , objectIdIterator++, info.MethodName);
+    CityObject method = CityObject.Create(CityObject.TypeEnum.Method , objectIdIterator++, info.MethodName);
     ObjectDict.Add(method.ID, method);
     method.transform.parent = CitySpace.transform;
 
@@ -65,7 +66,7 @@ public class CityObjectDB : MonoBehaviour
     CityObject lastPackage; // 最下位のパッケージ
     CityObject lastClass; // 最下位のクラス
 
-    Regex reg = new Regex("(.*)/(.*)");
+    Regex reg = new Regex("(.*)\\.(.*)");
     string package_text, class_text;
     Match match = reg.Match(classSig);
     if (match.Success) {
@@ -99,7 +100,7 @@ public class CityObjectDB : MonoBehaviour
       // 未知のパッケージの場合、生成して登録
       if (!lastPackage.PackageChildren.ContainsKey(name)) {
         // 生成
-        CityObject newPackage = CityObject.Create(CityObjectType.Package, objectIdIterator++, name);
+        CityObject newPackage = CityObject.Create(CityObject.TypeEnum.Package, objectIdIterator++, name);
         ObjectDict.Add(newPackage.ID, newPackage);
         newPackage.transform.parent = CitySpace.transform;
         // 親子関係の紐づけ
@@ -121,7 +122,7 @@ public class CityObjectDB : MonoBehaviour
       // 未知のクラスの場合、生成して登録
       if (!lastObject.ClassChildren.ContainsKey(name)) {
         // 生成
-        CityObject newClass = CityObject.Create(CityObjectType.Class, objectIdIterator++, name);
+        CityObject newClass = CityObject.Create(CityObject.TypeEnum.Class, objectIdIterator++, name);
         ObjectDict.Add(newClass.ID, newClass);
         newClass.transform.parent = CitySpace.transform;
         // 親子関係の紐づけ
@@ -136,7 +137,7 @@ public class CityObjectDB : MonoBehaviour
 
   private string[] PackageText2PackageNames(string text)
   {
-    string[] tokens = text.Split('/');
+    string[] tokens = text.Split('.');
     string[] outputs = new string[tokens.Length];
 
     for (int i = 0; i < tokens.Length; i++) {

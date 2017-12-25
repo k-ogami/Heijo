@@ -12,6 +12,9 @@ public class ClientConnector
 
   public Socket Socket = null;
 
+  public boolean IsFirstWrite() { return isFirstWrite; }
+  private boolean isFirstWrite = true;
+
   private MessagePack msgpack = new MessagePack();
 
   public ClientConnector(Socket socket)
@@ -32,8 +35,10 @@ public class ClientConnector
     }
   }
 
-  public <T> void write(T obj) throws IOException
+  public void write(Object obj) throws IOException
   {
+    isFirstWrite = false;
+
     byte[] payload = null;
     try {
       payload = msgpack.write(obj);

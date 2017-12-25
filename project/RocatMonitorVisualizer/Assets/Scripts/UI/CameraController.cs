@@ -30,7 +30,7 @@ public class CameraController : MonoBehaviour
     Vector3 delta = Input.mousePosition - preMousePos;
     // 拡大縮小
     float wheel = Input.GetAxis("Mouse ScrollWheel");
-    if (wheel != 0f) {
+    if (wheel != 0f && mouseInsideScreen()) {
       Camera.transform.position += Camera.transform.forward * wheel * ZoomSpeed;
     }
     // 回転
@@ -44,6 +44,13 @@ public class CameraController : MonoBehaviour
     }
     // 前フレームでのマウス位置の更新
     preMousePos = Input.mousePosition;
+  }
+
+  private bool mouseInsideScreen()
+  {
+    float x = Input.mousePosition.x;
+    float y = Input.mousePosition.y;
+    return 0 <= x && x < Screen.width && 0 <= y && y < Screen.height;
   }
 
 }
