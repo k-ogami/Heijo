@@ -9,6 +9,10 @@ public class Manager : MonoBehaviour
   public static ExeTimeDB ExeTimeDB = null;
   public static Connector Connector = null;
 
+#if UNITY_EDITOR
+  private IntervalPrinter intervalPrinter = new IntervalPrinter(10);
+#endif
+
   private void Awake()
   {
     CityMaker = GetComponent<CityMaker>();
@@ -22,9 +26,13 @@ public class Manager : MonoBehaviour
     if (Connector.HasReceivedData()) {
       Work();
     }
-  }
 
-  private void Work()
+#if UNITY_EDITOR
+    // intervalPrinter.interval();
+#endif
+}
+
+private void Work()
   {
     // 初生成のとき
     if (Connector.GetConnectFlag()) {
