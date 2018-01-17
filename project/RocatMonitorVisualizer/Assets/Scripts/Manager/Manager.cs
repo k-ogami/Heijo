@@ -10,7 +10,7 @@ public class Manager : MonoBehaviour
   public static Connector Connector = null;
 
 #if UNITY_EDITOR
-  private IntervalPrinter intervalPrinter = new IntervalPrinter(10);
+  // private IntervalPrinter intervalPrinter = new IntervalPrinter(10);
 #endif
 
   private void Awake()
@@ -27,12 +27,18 @@ public class Manager : MonoBehaviour
       Work();
     }
 
+    // 切断されたとき
+    if (Connector.GetCloseFlag()) {
+      // コネクションUI
+      UI.ConnectionUI.Closed();
+    }
+
 #if UNITY_EDITOR
     // intervalPrinter.interval();
 #endif
-}
+  }
 
-private void Work()
+  private void Work()
   {
     // 初生成のとき
     if (Connector.GetConnectFlag()) {
@@ -44,6 +50,8 @@ private void Work()
         CityObjectDB.RegistMethod(method);
       }
       CityMaker.Remake();
+      // コネクションUI
+      UI.ConnectionUI.Connected();
     }
 
     // メソッドの実行情報を登録

@@ -108,25 +108,30 @@ public class VisibleChanger : MonoBehaviour
       }
     }
 
-    if (doubleClick && CursoredObject != null && CursoredObject.Type != CityObject.TypeEnum.Method) {
-      if (CursoredObject.ChildrenVisible) {
-        CursoredObject.ChildrenVisible = false;
-        RecSetChildrenVisible(CursoredObject, false);
+    if (doubleClick && CursoredObject != null) {
+
+      // メソッドをダブルクリックした場合、親となるクラスを閉じる
+      CityObject target = CursoredObject.Type == CityObject.TypeEnum.Method ?  CursoredObject.Parent : CursoredObject;
+
+      if (target.ChildrenVisible) {
+        target.ChildrenVisible = false;
+        RecSetChildrenVisible(target, false);
       }
       else {
-        CursoredObject.ChildrenVisible = true;
-        RecSetChildrenVisible(CursoredObject, true);
+        target.ChildrenVisible = true;
+        RecSetChildrenVisible(target, true);
       }
+      target.SetVisible(true);
     }
   }
 
   private void RecSetChildrenVisible(CityObject obj, bool visible)
   {
     foreach (CityObject child in obj.Children) {
-      child.SetVisible(visible);
       if (child.ChildrenVisible) {
         RecSetChildrenVisible(child, visible);
       }
+      child.SetVisible(visible);
     }
   }
 

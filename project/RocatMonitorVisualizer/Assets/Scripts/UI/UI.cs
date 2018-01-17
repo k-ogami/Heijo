@@ -9,6 +9,8 @@ public class UI : MonoBehaviour
   public static VisibleChanger VisibleChanger = null;
   public static Descriptor Descriptor = null;
   public static HeightSlider HeightSlider = null;
+  public static VisibilityButton VisibilityButton = null;
+  public static ConnectionUI ConnectionUI = null;
 
   private void Awake()
   {
@@ -16,6 +18,8 @@ public class UI : MonoBehaviour
     VisibleChanger = GetComponent<VisibleChanger>();
     Descriptor = GetComponentInChildren<Descriptor>();
     HeightSlider = GetComponentInChildren<HeightSlider>();
+    VisibilityButton = GetComponent<VisibilityButton>();
+    ConnectionUI = GetComponent<ConnectionUI>();
   }
 
   // マウスカーソルがUIの上にあるか否か

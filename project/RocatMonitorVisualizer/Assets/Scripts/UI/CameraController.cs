@@ -11,6 +11,8 @@ public class CameraController : MonoBehaviour
   // ホイールで拡大縮小する速度
   public float ZoomSpeed = 0f;
 
+  public float MinHeight = 0f;
+
   // 前フレームでのマウス位置
   private Vector3 preMousePos = Vector3.zero;
 
@@ -31,7 +33,7 @@ public class CameraController : MonoBehaviour
     // 拡大縮小
     float wheel = Input.GetAxis("Mouse ScrollWheel");
     if (wheel != 0f && mouseInsideScreen()) {
-      Camera.transform.position += Camera.transform.forward * wheel * ZoomSpeed;
+      Camera.transform.position += Camera.transform.forward * wheel * ZoomSpeed * GetHeightValue();
     }
     // 回転
     if (Input.GetMouseButton(1)) {
@@ -40,7 +42,11 @@ public class CameraController : MonoBehaviour
     }
     // 移動
     if (Input.GetMouseButton(2)) {
-      Camera.transform.Translate(-delta * MoveSpeed);
+      Camera.transform.Translate(-delta * MoveSpeed * GetHeightValue());
+    }
+    // 最低限の高さを維持
+    if (Camera.transform.position.y < MinHeight) {
+      Camera.transform.position = new Vector3(Camera.transform.position.x, MinHeight, Camera.transform.position.z);
     }
     // 前フレームでのマウス位置の更新
     preMousePos = Input.mousePosition;
@@ -51,6 +57,14 @@ public class CameraController : MonoBehaviour
     float x = Input.mousePosition.x;
     float y = Input.mousePosition.y;
     return 0 <= x && x < Screen.width && 0 <= y && y < Screen.height;
+  }
+
+  // 高さによってかかる移動とズームの補正値。現状ただの平方根である
+  private float GetHeightValue()
+  {
+    float y = Camera.transform.position.y;
+    if (y < 1) return 1;
+    return Mathf.Sqrt(y);
   }
 
 }

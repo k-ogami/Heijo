@@ -15,6 +15,7 @@ public class Connector : MonoBehaviour
   public int Port = 0;
 
   [Header("Debug")]
+  public bool Connected = false;
   public bool DebugPrintLog = false;
 
   private TcpClient socket = new TcpClient();
@@ -24,6 +25,7 @@ public class Connector : MonoBehaviour
   private LinkedList<Message> receivedDataList = new LinkedList<Message>();
 
   private bool connect_flag = false;
+  private bool close_flag = false;
 
   MessagePackSerializer<Message> serializer = SerializationContext.Default.GetSerializer<Message>();
 
@@ -60,6 +62,14 @@ public class Connector : MonoBehaviour
     return flag;
   }
 
+  // 切断フラグを取得。取得後はfalseになる
+  public bool GetCloseFlag()
+  {
+    bool flag = close_flag;
+    close_flag = false;
+    return flag;
+  }
+
   // 初接続後、メソッド情報を抜き出す
   public List<MethodInfo> PopMethodInfo()
   {
@@ -90,8 +100,12 @@ public class Connector : MonoBehaviour
   private void ThreadLoop()
   {
     while (true) {
-      Accept();  // 接続が完了するまでブロック
-      Receive(); // 受信ループ。通信が切断されるまでブロック
+      try {
+        Accept();  // 接続が完了するまでブロック
+        Receive(); // 受信ループ。通信が切断されるまでブロック
+        connect_flag = Connected = false;
+        close_flag = true;
+      } catch (Exception e) { print(e); }
     }
   }
 
@@ -101,14 +115,15 @@ public class Connector : MonoBehaviour
     // 切断処理
     if (socket.Connected) {
       socket.Close();
-      receivedDataList.Clear();
     }
+    receivedDataList.Clear();
 
     TcpListener listener = new TcpListener(IPAddress.Any, Port);
     listener.Start();
     socket = listener.AcceptTcpClient();
     listener.Stop();
-    connect_flag = true;
+    connect_flag = Connected = true;
+    close_flag = false;
   }
 
   // 受信ループ処理
@@ -129,9 +144,20 @@ public class Connector : MonoBehaviour
         int h_count = HEADER_SIZE;
         while (h_count != 0) {
           Thread.Sleep(1);
-          int read = stream.Read(header, HEADER_SIZE - h_count, h_count);
+          int read = 0;
+          bool close = false;
+          try {
+            read = stream.Read(header, HEADER_SIZE - h_count, h_count);
+          }
+          catch (IOException) { }
+          if (read == 0) close = true;
+          if (close) {
+            if (DebugPrintLog) {
+              print("Connector:ヘッダ受信中に切断されました");
+            }
+            return;
+          }
           h_count -= read;
-          if (read == 0) return;
         }
         Array.Reverse(header);
         payload_size = BitConverter.ToInt32(header, 0);
@@ -148,9 +174,20 @@ public class Connector : MonoBehaviour
         int p_count = payload_size;
         while (p_count != 0) {
           Thread.Sleep(1);
-          int read = stream.Read(payload, payload_size - p_count, p_count);
+          int read = 0;
+          bool close = false;
+          try {
+            read = stream.Read(payload, payload_size - p_count, p_count);
+          }
+          catch (IOException) { }
+          if (read == 0) close = true;
+          if (close) {
+            if (DebugPrintLog) {
+              print("Connector:ヘッダ受信中に切断されました");
+            }
+            return;
+          }
           p_count -= read;
-          if (read == 0) return;
         }
       }
       if (DebugPrintLog) {
@@ -163,6 +200,14 @@ public class Connector : MonoBehaviour
         }
       }
     }
+  }
+
+  public void Close()
+  {
+    if (socket.Connected) {
+      socket.Close();
+    }
+    connect_flag = Connected = false;
   }
 
 }

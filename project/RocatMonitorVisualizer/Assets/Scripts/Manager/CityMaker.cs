@@ -30,6 +30,8 @@ public class CityMaker : MonoBehaviour
     RecSetThreashold(Manager.CityObjectDB.DefaultPackage);
     // 色の設定
     RecSetColor(Manager.CityObjectDB.DefaultPackage);
+    // 可視レベルをパッケージに設定
+    UI.VisibilityButton.OnPackageButton();
   }
 
   private void ResetPos()

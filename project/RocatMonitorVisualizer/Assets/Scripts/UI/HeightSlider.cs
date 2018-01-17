@@ -23,6 +23,8 @@ public class HeightSlider : MonoBehaviour
 
   private void RecSetHeight(CityObject obj)
   {
+    if (obj == null) return;
+
     obj.SetHeight(obj.Height_0_1, Slider.value);
     foreach (CityObject child in obj.PackageChildren.Values) {
       RecSetHeight(child);
