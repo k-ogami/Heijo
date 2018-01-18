@@ -18,10 +18,10 @@ public class XposedModule implements IXposedHookLoadPackage
   @Override
   public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable
   {
-    if (!loadPackageParam.isFirstApplication || !loadPackageParam.packageName.equals(loadPackageParam.processName)) return;
-
-    // FIXME GoogleStoreでインストール時にBadParcelableException: ClassNotFoundException when unmarchalling
-    if (loadPackageParam.packageName.equals("com.android.vending")) return;
+    // FIXME Noxのときでは使えた省略処理が実機（Android7.0,huawei nova lite）では動作しない？
+    //if (!loadPackageParam.isFirstApplication || !loadPackageParam.packageName.equals(loadPackageParam.processName)) return;
+    // FIXME GoogleStoreでインストール時にBadParcelableException: ClassNotFoundException when unmarchalling。Noxだけ？
+    //if (loadPackageParam.packageName.equals("com.android.vending")) return;
 
     // アプリケーションの起動にフックする
     XposedHelpers.findAndHookMethod(
