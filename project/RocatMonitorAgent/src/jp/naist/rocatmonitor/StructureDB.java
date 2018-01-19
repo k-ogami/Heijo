@@ -16,31 +16,59 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
-import jp.naist.rocatmonitor.message.MethodData;
+import jp.naist.rocatmonitor.message.MethodInfo;
 
 public class StructureDB
 {
 
   // メソッドIDとメソッド情報のMap。現状Listでも良いがデバッグの際に便利なので
-  public Map<Long, MethodData> IdDataMap = new HashMap<>();
+  public Map<Integer, MethodInfo> IdDataMap = new HashMap<>();
 
   // メソッドの完全名（パッケージ名+クラス名+メソッド名）とメソッドIDのMap。サンプリングの際、StackTraceElemet->メソッドIDの変換のために用いる
-  public Map<String, Long> NameIdMap = new HashMap<>();
+  public Map<String, Integer> NameIdMap = new HashMap<>();
 
   // クラス名のSet。サンプリングの際、StackTraceElemet.getClassName()がサンプリング対象であるか否かの判別に用いる
   public Set<String> ClassNameSet = new HashSet<>();
 
-  private final Set<String> ignorePackages;
+  // 監視対象外パッケージ
+  public Set<String> IgnorePackageNameSet = new HashSet<>();
 
-  private long methodIdIterator = 0;
+  private int methodIdIterator = 0;
+  private Set<String> methodNameSet = new HashSet<>();
 
-  // メソッド名の重複を防ぐためのSet。1クラスごとにクリアする
-  // StackTraceElementがメソッドシグネチャ（引数の型）を含んでいないため、仕様上、オーバーロードされたメソッドはすべて同一と見なす
-  Set<String> methodNameSet = new HashSet<>();
-
-  public StructureDB(Set<String> ignorePackages)
+  public void registMethod(String className, String methodName)
   {
-    this.ignorePackages = new HashSet<>(ignorePackages);
+    // オーバーロードされたメソッドは区別しない（スタックトレースからは引数の型が取得できないので）
+    if (NameIdMap.containsKey(className + "." + methodName)) return;
+
+    // メソッド情報を登録
+    MethodInfo method = new MethodInfo(methodIdIterator++, className, methodName);
+    IdDataMap.put(method.MethodID, method);
+    NameIdMap.put(method.toString(), method.MethodID);
+
+    ClassNameSet.add(className);
+  }
+
+  public boolean isIgnorePackage(String packageName)
+  {
+    if (packageName == null || packageName.length() == 0) {
+      return IgnorePackageNameSet.contains(ConstValue.DEFAULT_PACKAGE_NAME);
+    }
+
+    String[] tokens = packageName.split("\\.");
+
+    StringBuilder builder = new StringBuilder();
+    for (int i = 0; i < tokens.length; i++) {
+      builder.append(tokens[i]);
+      if (IgnorePackageNameSet.contains(builder.toString() + ".*")) {
+        return true;
+      }
+      if (i == tokens.length - 1 && IgnorePackageNameSet.contains(builder.toString())) {
+        return true;
+      }
+      builder.append(".");
+    }
+    return false;
   }
 
   public void collectFromClassPath() throws IOException
@@ -106,12 +134,12 @@ public class StructureDB
     CtConstructor clinit = klass.getClassInitializer();
     isDecClinit = clinit != null && clinit.getDeclaringClass().getName().equals(klass.getName());
     if (isDecInit) {
-      MethodData data = new MethodData(methodIdIterator++, klass.getName(), "<init>");
+      MethodInfo data = new MethodInfo(methodIdIterator++, klass.getName(), "<init>");
       IdDataMap.put(data.MethodID, data);
       NameIdMap.put(data.toString(), data.MethodID);
     }
     if (isDecClinit) {
-      MethodData data = new MethodData(methodIdIterator++, klass.getName(), "<clinit>");
+      MethodInfo data = new MethodInfo(methodIdIterator++, klass.getName(), "<clinit>");
       IdDataMap.put(data.MethodID, data);
       NameIdMap.put(data.toString(), data.MethodID);
     }
@@ -120,34 +148,12 @@ public class StructureDB
       // メソッド名の重複を防ぐ
       if (!methodNameSet.contains(method.getName())) {
         methodNameSet.add(method.getName());
-        MethodData data = new MethodData(methodIdIterator++, klass.getName(), method.getName());
+        MethodInfo data = new MethodInfo(methodIdIterator++, klass.getName(), method.getName());
         IdDataMap.put(data.MethodID, data);
         NameIdMap.put(data.toString(), data.MethodID);
       }
     }
     methodNameSet.clear();
-  }
-
-  private boolean isIgnorePackage(String packageName)
-  {
-    if (packageName == null) {
-      return ignorePackages.contains(ConstValue.DEFAULT_PACKAGE_NAME);
-    }
-
-    String[] tokens = packageName.split("\\.");
-
-    StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < tokens.length; i++) {
-      builder.append(tokens[i]);
-      if (ignorePackages.contains(builder.toString() + ".*")) {
-        return true;
-      }
-      if (i == tokens.length - 1 && ignorePackages.contains(builder.toString())) {
-        return true;
-      }
-      builder.append(".");
-    }
-    return false;
   }
 
 }

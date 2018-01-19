@@ -1,5 +1,7 @@
 package jp.naist.rocatmonitor.debug;
 
+import java.util.Formatter;
+
 public class IntervalPrinter
 {
 
@@ -9,6 +11,13 @@ public class IntervalPrinter
   private long before = 0;
   private long sum = 0;
   private int counter = 0;
+
+  private Formatter formatter = new Formatter();
+
+  public IntervalPrinter(int time)
+  {
+    this(time, null);
+  }
 
   public IntervalPrinter(int time, String tag)
   {
@@ -31,7 +40,12 @@ public class IntervalPrinter
 
     if (time <= counter) {
       double average = (double)sum / time / 1000000;
-      System.out.printf("[" + tag + "] %.2f [ms]\n", average);
+      if (tag == null) {
+        System.out.println(formatter.format("%.2f [ms]\n", average).toString());
+      }
+      else {
+        System.out.println(formatter.format("[" + tag + "] %.2f [ms]\n", average).toString());
+      }
       sum = counter = 0;
     }
     before = now;

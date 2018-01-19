@@ -99,14 +99,14 @@ public class Connector : MonoBehaviour
   // 別スレッドで処理される処理
   private void ThreadLoop()
   {
-    while (true) {
-      try {
+    try {
+      while (true) {
         Accept();  // 接続が完了するまでブロック
         Receive(); // 受信ループ。通信が切断されるまでブロック
         connect_flag = Connected = false;
         close_flag = true;
-      } catch (Exception e) { print(e); }
-    }
+      }
+    } catch (ThreadAbortException) { }
   }
 
   // 接続待ち

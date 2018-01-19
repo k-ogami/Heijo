@@ -1,33 +1,33 @@
 package jp.naist.rocatmonitor.message;
 
 @org.msgpack.annotation.Message
-public class MethodData
+public class MethodInfo
 {
 
   @org.msgpack.annotation.Index(0)
-  public long MethodID;
+  public int MethodID;
 
   @org.msgpack.annotation.Index(1)
-  public String ClassSig;
+  public String ClassName;
 
   @org.msgpack.annotation.Index(2)
   public String MethodName;
 
-  public MethodData()
+  public MethodInfo()
   {
   }
 
-  public MethodData(long methodID, String classSig, String methodName)
+  public MethodInfo(int methodID, String className, String methodName)
   {
     MethodID = methodID;
-    ClassSig = classSig;
+    ClassName = className;
     MethodName = methodName;
   }
 
   @Override
   public String toString()
   {
-    return ClassSig + "." + MethodName;
+    return ClassName + "." + MethodName;
   }
 
 }

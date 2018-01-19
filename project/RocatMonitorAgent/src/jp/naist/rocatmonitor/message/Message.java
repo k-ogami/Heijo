@@ -8,15 +8,15 @@ public class Message
 {
 
   @org.msgpack.annotation.Index(0)
-  public long Time = 0;
+  public long CurrentTime = 0;
 
   @org.msgpack.annotation.Index(1)
-  public long SamplingCount = 0;
+  public double TimeLength = 0;
 
   @org.msgpack.annotation.Index(2)
-  public List<MethodData> MethodDatas = new LinkedList<>();
+  public List<MethodInfo> Methods = new LinkedList<>();
 
   @org.msgpack.annotation.Index(3)
-  public List<SamplingData> SamplingDatas = new LinkedList<>();
+  public List<ExeTimeInfo> ExeTimes = new LinkedList<>();
 
 }
