@@ -2,10 +2,8 @@ package jp.naist.rocatmonitor;
 
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.util.LinkedList;
 
 import jp.naist.rocatmonitor.debug.DebugValue;
-import jp.naist.rocatmonitor.message.Message;
 import jp.naist.rocatmonitor.timer.Scheduler;
 
 public class Monitor
@@ -51,16 +49,11 @@ public class Monitor
         }
       }
 
-      // クラスパス以下のクラスファイルを走査して、パッケージ・クラス・メソッド名を収集・送信
+      // クラスパス以下のクラスファイルを走査して、パッケージ・クラス・メソッド名を収集
       getInstance().StructureDB = new StructureDB();
       getInstance().StructureDB.IgnorePackageNameSet.addAll(getInstance().Config.IgnorePackages);
       try {
         getInstance().StructureDB.collectFromClassPath();
-        if (!(DebugValue.DEBUG_FLAG && DebugValue.DEBUG_NO_CONNECT)) {
-          Message message = new Message();
-          message.Methods = new LinkedList<>(getInstance().StructureDB.IdDataMap.values());
-          getInstance().Connector.write(message);
-        }
       } catch (IOException e) {
         System.out.println("Failed to access to class files");
         if (!(DebugValue.DEBUG_FLAG && DebugValue.DEBUG_NO_CONNECT)) {
