@@ -5,6 +5,8 @@ public class ConstValue
 
   public static final String THIS_PACKAGE_NAME = "jp.naist.rocatmonitor.androcatmonitorxp";
 
+  public static final String LOG_TAG = "androcatmonitorxp";
+
   public static final String DEFAULT_PACKAGE_NAME = "<default-package>";
 
   public static final int HEADER_SIZE = 4;

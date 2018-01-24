@@ -5,9 +5,9 @@ import android.content.Intent;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import jp.naist.rocatmonitor.androcatmonitorxp.debug.Logger;
 
 public class XposedModule implements IXposedHookLoadPackage
 {
@@ -18,8 +18,8 @@ public class XposedModule implements IXposedHookLoadPackage
   @Override
   public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable
   {
-    // FIXME Noxのときでは使えた省略処理が実機（Android7.0,huawei nova lite）では動作しない？
-    //if (!loadPackageParam.isFirstApplication || !loadPackageParam.packageName.equals(loadPackageParam.processName)) return;
+
+    if (!loadPackageParam.isFirstApplication || !loadPackageParam.packageName.equals(loadPackageParam.processName)) return;
 
     // FIXME GoogleStoreでインストール時にBadParcelableException: ClassNotFoundException when unmarchalling
     if (loadPackageParam.packageName.equals("com.android.vending")) return;
@@ -38,12 +38,13 @@ public class XposedModule implements IXposedHookLoadPackage
         Intent intent = (Intent)methodHookParam.args[2];
         String target = intent.getStringExtra(ConstValue.BUNDLE_TARGET_PACKAGE_NAME);
         if (target == null || !target.equals(loadPackageParam.packageName)) return;
-        XposedBridge.log("Starting to monitor \"" + target + "\"");
+        Logger.write("Starting to monitor \"" + target + "\"");
         // 監視のための初期化処理
         Activity activity = (Activity)methodHookParam.getResult();
         enable = Monitor.getInstance().init(activity, intent, loadPackageParam.appInfo);
       }
     });
+
   }
 
 }
