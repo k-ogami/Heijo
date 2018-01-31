@@ -1,2 +1,0 @@
-﻿# RocatMonitorLogger
-データ保存用プログラム。Visualizerと同じように先に起動しておき、アプリケーション側から接続して使用する。接続時にmethods.json，接続切れかCtrl+Cなどで強制終了したときにexecution.jsonを出力する。
