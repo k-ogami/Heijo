@@ -45,7 +45,9 @@ public class SampleThread extends Thread
       for (StackTraceElement frame : entry.getValue()) {
         if (frame.isNativeMethod()) continue;
         if (Monitor.getInstance().StructureDB.ClassNameSet.contains(frame.getClassName())) {
-          int methodID = Monitor.getInstance().StructureDB.NameIdMap.get(frame.getClassName() + "." + frame.getMethodName());
+          Integer methodID_obj = Monitor.getInstance().StructureDB.NameIdMap.get(frame.getClassName() + "." + frame.getMethodName());
+          if (methodID_obj == null) continue;
+          int methodID = methodID_obj;
           sampledMethodIdSet.add(new Pair<>(methodID, entry.getKey().getId()));
           break;
         }

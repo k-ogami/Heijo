@@ -18,6 +18,8 @@ public class XposedModule implements IXposedHookLoadPackage
   @Override
   public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable
   {
+    // デバッグ用
+    // Logger.write(loadPackageParam.isFirstApplication + "/" + loadPackageParam.packageName + "/" + loadPackageParam.processName);
 
     if (!loadPackageParam.isFirstApplication || !loadPackageParam.packageName.equals(loadPackageParam.processName)) return;
 

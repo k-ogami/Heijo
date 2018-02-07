@@ -72,7 +72,7 @@
         android:id="@+id/ignoreEditText"
         android:inputType="textMultiLine"
         android:layout_height="100dp"
-        android:text="android.*, com.example.*"/>
+        android:text="android.support.*, com.example.*"/>
 
     <Space
         android:layout_width="match_parent"
