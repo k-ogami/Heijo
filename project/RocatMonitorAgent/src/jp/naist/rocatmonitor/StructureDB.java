@@ -121,12 +121,13 @@ public class StructureDB
   {
     CtClass klass = ClassPool.getDefault().makeClass(stream);
 
-    if (isIgnorePackage(klass.getPackageName())) {
-      return;
-    } else {
-      ClassNameSet.add(klass.getName());
-    }
+    // 除外対象の場合は無視
+    if (isIgnorePackage(klass.getPackageName())) return;
 
+    boolean notExist = ClassNameSet.add(klass.getName());
+
+    // クラスが重複している場合は無視（クラスパスの優先度は記述順なので、優先度が低い側が無視されるはず）
+    if (!notExist) return;
 
     // コンストラクタ<init>と<clinit>の有無を確認して、存在する場合は追加
     boolean isDecInit = 0 < klass.getDeclaredConstructors().length;
