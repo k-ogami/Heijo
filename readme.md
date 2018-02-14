@@ -16,4 +16,5 @@ java -javaagent:"RocatMonitorAgent.jar" -jar TargetApp.jar
 
 Androidアプリケーションのプロファイリングを行う場合は、Xposed FrameworkがインストールされたAndroidが必要です。
 実機を使用する場合はroot化などやや危険で面倒な作業が伴うので、ワンクリックでroot化が可能なAndroid仮想マシンであるNoxを使用することをお勧めします。
-AndroidにAndrocatMonitorXP.apkをインストールさせて起動させます。
+AndroidにAndrocatMonitorXP.apkをインストールさせ、Xposed Frameworkの画面からAndrocatMonitorXPを有効にした後、一度Androidを再起動します。
+その後、AndrocatMonitorXPを起動させれば、プロファイリング開始のための設定画面が開きます。
