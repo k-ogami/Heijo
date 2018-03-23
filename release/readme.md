@@ -9,7 +9,7 @@ HeijoVisualizerを実行します（Windows版とMac版がビルド済み）。
  java -javaagent:HeijoAgent.jar -jar TargetApp.jar
 ```
 
- * Androidアプリケーションの場合
+ * Androidアプリケーションの場合  
 root化の作業とXposed FrameworkがインストールされたAndroid端末が必要で、準備がそれなりに大変かつ危険です。  
 Android仮想マシンであるNoxを使用する場合、ワンクリックでroot化のon-offが可能なので非常に楽です。  
 これらの準備ができたら、Androidにjp.naist.heijo.android.apkをインストールして、Xposed Installerの画面から
@@ -35,7 +35,7 @@ HeijoAgent.jarの中に含まれているCONFIG.propertiesを編集して、パ�
 ```
 # 送信先のホスト
 HOST = localhost
-# 送信先のポート
+# 送信先のポート（ビジュアライザのポートが現状8000固定なので、実質この値も8000固定です）
 PORT = 8000
 # サンプリング間隔[ms]
 SAMPLE_INTERVAL = 2
