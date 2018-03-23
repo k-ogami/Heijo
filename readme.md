@@ -1,7 +1,7 @@
 ﻿![](https://raw.githubusercontent.com/k-ogami/RocatMonitor/for_readme/logo.png)  
 奈良先端科学技術大学院大学 情報科学研究科 ソフトウェア工学研究室 大神による、『リアルタイム3Dプロファイラ：Heijo』のプロジェクト。  
 JavaアプリケーションあるいはAndroidアプリケーションの実行時間パフォーマンスを3D空間でリアルタイムに可視化します。  
-ツール名は『Heijo』となっていますが、リポジトリ名や各プログラム名は仮名の『Rocatmonitor』ままになっています……。
+（rocatmonitorはheijoの旧名です。もしコメントやreadme内にrocatmonitorが残っていたら、heijoに置き換えて読んでください）
 
 ## ビデオ
 クリックでyoutubeに飛びます。  

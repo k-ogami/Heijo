@@ -1,23 +1,23 @@
-﻿# RocatMonitorVisualizer
+﻿# HeijoVisualizer
 可視化プログラムのUnityプロジェクトです。
 
-# RocatMonitorAgent
+# HeijoAgent
 計測プログラム（Java用）のEclipseプロジェクトです。
 * 実行の流れ
 -javaagentオプションでエージェントが指定される  
 ↓
 マニフェストファイルの記述によりクラスが指定される。
 ```
-Premain-Class: jp.naist.rocatmonitor.Monitor
+Premain-Class: jp.naist.heijo.Monitor
 ```
 ↓
 Monitorクラスのpremainメソッドが、JVMの初期化直後に呼び出される。
 
-# AndrocatMonitorXP
+# Heijoroid
 計測プログラム（Android用）のAndroid Studioプロジェクトです。  
 ActivityとXposedモジュールの両方が含まれており、プロファイリングの際にはそれぞれ2種類のプロセスで実行されます。  
 
-* jp/naist/rocatmonitor/androcatmonitorxp/MainActivity.java
+* jp/naist/heijo/android/MainActivity.java
 一般的なアプリケーションと同様、ホームからアイコンをタップして起動します。  
 プロファイリング用の値をputExtraして任意のアプリケーションをstartActivityするだけの簡単なアプリケーションです。
 ```
@@ -36,7 +36,7 @@ if (selectedApp == null) {
 startActivity(selectedApp);
 ```
 
-* jp/naist/rocatmonitor/androcatmonitorxp/XposedModule.java
+* jp/naist/heijo/android/XposedModule.java
 Xposedフレームワークから実行され、すべてのActivityの起動（android.app.Instrumentatio.newActivity）の直後にフックをかけます。  
 Intentを参照し、MainActivityによってセットされた値が存在する場合にのみ、プロファイリング処理の用意を開始します。
 ```

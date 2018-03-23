@@ -1,9 +1,9 @@
-﻿# RocatMonitorLogger
+﻿# HeijoLogger
 研究用・テスト用ツール。  
 計測プログラムから送信されたデータをプログラム終了時にjsonファイルに出力します。  
 可視化プログラムの接続と同じ要領で、先にこれを立ち上げてから計測プログラム（Java用・Android用どちらでも）を立ち上げてください。
 ```
-java -jar RocatMonitorLogger.jar
+java -jar HeijoLogger.jar
 接続待ち……
 接続完了 # 計測プログラムから接続要求があった
 methods.jsonを出力 # 最初にメソッド情報を出力
